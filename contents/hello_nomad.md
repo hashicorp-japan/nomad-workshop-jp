@@ -189,7 +189,7 @@ $nomad job run example.nomad
 ==> Evaluation "164d6cf5" finished with status "complete"
 ```
 
-`docker ps`でコンテナの情報を見てみましょう。
+しばらくおいて`docker ps`でコンテナの情報を見てみましょう。
 
 ```console
 $docker ps
@@ -199,6 +199,7 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 a47d0ae31dd2        redis:3.2           "docker-entrypoint.s…"   56 seconds ago      Up 55 seconds       127.0.0.1:23735->6379/tcp, 127.0.0.1:23735->6379/udp   redis-b8c71633-c333-c6e9-8217-a4c0bdddf180
 ```
 
+Jobファイルの定義通りコンテナが３つ起動していることが確認できます。
 さて、NomadはJobファイルに書かれている状態を維持するようJobを監視します。そこで、強制的にひとつのコンテナを`kill`してみましょう。ここではContainer IDが`94401e464ba7`のコンテナを終了させます。
 
 ```console
