@@ -87,7 +87,7 @@ job "example" {
   }
 ```
 
-Jobファイルには、「何を」「どう」デプロイするを宣言って気に記述します。
+Jobファイルには、「何を」「どこに」デプロイするかを*宣言的*に記述します。
 この例では、Dockerを使って`redis:3.2`イメージのコンテナを一つ起動します。また、500MhzのCPUと256MBのメモリ容量と10Mbit/sのネットワーク帯域を満たしているNodeでのみ実行されます。
 
 では実際に実行してみましょう。
@@ -175,7 +175,7 @@ potentially invalid.
 ```
 
 Plan内容をみてみると、Countが１から３に変更されたことが確認できます。
-あたらしいJobファイルを実行してみましょう。
+新しいJobファイルを実行してみましょう。
 
 ```console
 $nomad job run example.nomad
@@ -224,7 +224,7 @@ a47d0ae31dd2        redis:3.2           "docker-entrypoint.s…"   2 minutes ago
 ```
 
 Jobファイルで定義した状態に戻っています。
-これらのNomadの作業状態をみるには、`nomad job status`コマンドを使います。
+このNomadの作業状態をみるには、`nomad job status`コマンドを使います。
 
 ```console
 $nomad job status example
@@ -265,12 +265,3 @@ $nomad job stop example
 ```
 
 終了するとNomadがAllocationしたJobがクリーンアップされます。
-
-
-
-
-
-
-
-
-
