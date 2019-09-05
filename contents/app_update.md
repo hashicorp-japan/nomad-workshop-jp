@@ -7,7 +7,6 @@
 
 ```hcl
 job "demo-webapp" {
-	region = "local"
   datacenters = ["dc1"]
 
   group "demo" {
@@ -137,7 +136,6 @@ Time                       Type        Description
 
 ```hcl
 job "demo-webapp-masademo" {
-	region = "local"
   datacenters = ["dc1"]
 
   update {
