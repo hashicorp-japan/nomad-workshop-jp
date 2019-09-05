@@ -204,7 +204,18 @@ job "demo-webapp-masademo" {
 
 この設定では、アプリケーションを一つづつアップデートするローリングアップデートを行います。
 
+それではアップデートを行ってみましょう。
 
+```shell
+nomad run demo-webapp-update.nomad
+```
+
+各アプリケーションが順番にアップデートされていきます。
+再度アプリケーションのIPアドレスとポートを確認してアクセスしてみます。
+
+![image](https://user-images.githubusercontent.com/45160975/64311041-8d7cd000-cfdd-11e9-94f8-3c0d89094800.png)
+
+バージョンがv2になっていることが確認できます。
 
 
 
