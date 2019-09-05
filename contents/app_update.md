@@ -128,7 +128,7 @@ Time                       Type        Description
 
 この例では、`http: 172.20.20.11:20009`でアプリケーションが動いてることがわかります。
 アクセスしてみると、以下のように表示されます。
-![https://github.com/hashicorp-japan/nomad-workshop/issues/2](https://github.com/hashicorp-japan/nomad-workshop/issues/2)
+![app_v1](https://user-images.githubusercontent.com/45160975/64308132-383bc100-cfd3-11e9-8117-caa4d038593a.png)
 
 次に、このアプリケーションを`v2`にアップデートしてみましょう。
 それを行うには、アップデート用のJobファイルを準備します。
