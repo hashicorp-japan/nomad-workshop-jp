@@ -135,7 +135,7 @@ Time                       Type        Description
 先ほどのJobファイルをコピーしてdemo-webapp-update.nomadなどにしてください。そして、以下のように書き換えます。
 
 ```hcl
-job "demo-webapp-masademo" {
+job "demo-webapp" {
   datacenters = ["dc1"]
 
   update {
