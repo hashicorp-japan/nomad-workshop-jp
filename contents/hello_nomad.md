@@ -9,7 +9,7 @@ Nomadは他のHashiCorp製品と同様にシングルバイナリですので、
 Nomadのバージョンが表示されるか確認してみましょう。
 
 ```console
-$nomad version
+$ nomad version
 Nomad v0.9.5 (1cbb2b9a81b5715be2f201a4650293c9ae517b87)
 ```
 次にDevモードでサーバーを起動してみます。
@@ -25,7 +25,7 @@ DevモードではNomadの機能を確認したりテストするのを容易に
 サーバーのステータスやリストを見るには以下のコマンドを叩きます。
 
 ```console
-$nomad server members
+$ nomad server members
 Name                        Address    Port  Status  Leader  Protocol  Build  Datacenter  Region
 masa-mackbook.local.global  127.0.0.1  4648  alive   true    2         0.9.5  dc1         global
 ```
@@ -33,7 +33,7 @@ masa-mackbook.local.global  127.0.0.1  4648  alive   true    2         0.9.5  dc
 クライアントのステータスをみるには以下のコマンドを叩きます。
 
 ```console
-$nomad node status
+$ nomad node status
 ID        DC   Name                 Class   Drain  Eligibility  Status
 33a379fc  dc1  masa-mackbook.local  <none>  false  eligible     ready
 ```
@@ -43,7 +43,7 @@ ID        DC   Name                 Class   Drain  Eligibility  Status
 NomadにはサンプルのJobファイルを作成する機能があります。
 
 ```shell
-nomad job init -short     # -shortオプションをつけるとコメント無しのJobファイルが作成されます
+$ nomad job init -short     # -shortオプションをつけるとコメント無しのJobファイルが作成されます
 ```
 
 ディレクトリ内にexample.nomadというファイルが作られます。NomadのJobファイルは.nomadという拡張子になります。Jobファイルの詳細については[こちら](https://www.nomadproject.io/docs/job-specification/index.html)を参照ください。
@@ -93,7 +93,7 @@ Jobファイルには、「何を」「どこに」デプロイするかを*宣�
 では実際に実行してみましょう。
 
 ```console
-$nomad job run example.nomad
+$ nomad job run example.nomad
 ==> Monitoring evaluation "9b9e5f9b"
     Evaluation triggered by job "example"
     Evaluation within deployment: "a3022d8f"
@@ -105,7 +105,7 @@ $nomad job run example.nomad
 実際にコンテナが起動したか確認してみましょう。
 
 ```console
-$docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                                                  NAMES
 8dd1bfd98166        redis:3.2           "docker-entrypoint.s…"   About a minute ago   Up About a minute   127.0.0.1:28646->6379/tcp, 127.0.0.1:28646->6379/udp   redis-0450729c-179f-b373-0cc9-513514275d91
 ```
@@ -114,7 +114,7 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 ログは`nomad logs`コマンドからみれます。引数にAllocation IDを指定します。今回の例では、Jobをrunしたときの出力から`701f3254`であることがわかります。
 
 ```console
-$nomad logs 701f3254
+$ nomad logs 701f3254
 1:C 29 Aug 06:53:41.954 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
                 _._
            _.-``__ ''-._
@@ -153,7 +153,7 @@ group "cache" {
 NomadにはJobファイルの変更により、何がどう変わるかをPlanしてくれる機能があります。これにより、変更した内容の検証及びその変更が想定したものと問題ないか、事前に確認できます。
 
 ```console
-$nomad job plan example.nomad
+$ nomad job plan example.nomad
 +/- Job: "example"
 +/- Stop: "true" => "false"
 +/- Task Group: "cache" (3 create)
@@ -178,7 +178,7 @@ Plan内容をみてみると、Countが１から３に変更されたことが�
 新しいJobファイルを実行してみましょう。
 
 ```console
-$nomad job run example.nomad
+$ nomad job run example.nomad
 ==> Monitoring evaluation "164d6cf5"
     Evaluation triggered by job "example"
     Allocation "8cf4812b" created: node "33a379fc", group "cache"
@@ -192,7 +192,7 @@ $nomad job run example.nomad
 しばらくおいて`docker ps`でコンテナの情報を見てみましょう。
 
 ```console
-$docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                  NAMES
 94401e464ba7        redis:3.2           "docker-entrypoint.s…"   56 seconds ago      Up 55 seconds       127.0.0.1:31303->6379/tcp, 127.0.0.1:31303->6379/udp   redis-8cf4812b-c0fe-c817-acfa-3b42920743a2
 834de1552749        redis:3.2           "docker-entrypoint.s…"   56 seconds ago      Up 56 seconds       127.0.0.1:28871->6379/tcp, 127.0.0.1:28871->6379/udp   redis-bb7db1e3-c015-a9fe-1388-dd3016791e8b
@@ -203,7 +203,7 @@ Jobファイルの定義通りコンテナが３つ起動していることが�
 さて、NomadはJobファイルに書かれている状態を維持するようJobを監視します。そこで、強制的にひとつのコンテナを`kill`してみましょう。ここではContainer IDが`94401e464ba7`のコンテナを終了させます。
 
 ```console
-$docker kill 94401e464ba7
+$ docker kill 94401e464ba7
 94401e464ba7
 $docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                  NAMES
@@ -217,7 +217,7 @@ Nomadは裏側でその変更を監視しており、本来の「あるべき姿
 しばらく待ってから、再度Dockerの状態を確認してみましょう。
 
 ```console
-$docker ps
+$ docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                  PORTS                                                  NAMES
 d0d3dd071082        redis:3.2           "docker-entrypoint.s…"   1 second ago        Up Less than a second   127.0.0.1:31303->6379/tcp, 127.0.0.1:31303->6379/udp   redis-8cf4812b-c0fe-c817-acfa-3b42920743a2
 834de1552749        redis:3.2           "docker-entrypoint.s…"   2 minutes ago       Up 2 minutes            127.0.0.1:28871->6379/tcp, 127.0.0.1:28871->6379/udp   redis-bb7db1e3-c015-a9fe-1388-dd3016791e8b
@@ -228,7 +228,7 @@ Jobファイルで定義した状態に戻っています。
 このNomadの作業状態をみるには、`nomad job status`コマンドを使います。
 
 ```console
-$nomad job status example
+$ nomad job status example
 ID            = example
 Name          = example
 Submit Date   = 2019-08-30T13:42:31+09:00
@@ -258,7 +258,7 @@ bb7db1e3  33a379fc  cache       7        run      running   24m5s ago   23m45s a
 NomadのJobを終了させるには`nomad job stop`コマンドを使います。
 
 ```console
-$nomad job stop example
+$ nomad job stop example
 ==> Monitoring evaluation "8b5de473"
     Evaluation triggered by job "example"
     Evaluation status changed: "pending" -> "complete"
