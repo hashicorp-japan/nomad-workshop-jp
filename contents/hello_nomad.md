@@ -10,6 +10,7 @@ Nomadのバージョンが表示されるか確認してみましょう。
 
 ```console
 $ nomad version
+
 Nomad v0.9.5 (1cbb2b9a81b5715be2f201a4650293c9ae517b87)
 ```
 次にDevモードでサーバーを起動してみます。
@@ -22,15 +23,16 @@ $ nomad agent -dev
 
 DevモードではNomadの機能を確認したりテストするのを容易にするため、サーバーととクライアント両方の特性を持って起動されます。
 
-サーバーのステータスやリストを見るには以下のコマンドを叩きます。
+サーバーのステータスやリストを見るには以下のコマンドを実行します。
 
 ```console
 $ nomad server members
+
 Name                        Address    Port  Status  Leader  Protocol  Build  Datacenter  Region
 masa-mackbook.local.global  127.0.0.1  4648  alive   true    2         0.9.5  dc1         global
 ```
 
-クライアントのステータスをみるには以下のコマンドを叩きます。
+クライアントのステータスをみるには以下のコマンドを実行します。
 
 ```console
 $ nomad node status
@@ -48,7 +50,9 @@ $ nomad job init -short     # -shortオプションをつけるとコメント�
 
 ディレクトリ内にexample.nomadというファイルが作られます。NomadのJobファイルは.nomadという拡張子になります。Jobファイルの詳細については[こちら](https://www.nomadproject.io/docs/job-specification/index.html)を参照ください。
 
-```hcl
+```console
+$ cat example.nomad
+
 job "example" {
   datacenters = ["dc1"]
 
@@ -94,6 +98,7 @@ Jobファイルには、「何を」「どこに」デプロイするかを*宣�
 
 ```console
 $ nomad job run example.nomad
+
 ==> Monitoring evaluation "9b9e5f9b"
     Evaluation triggered by job "example"
     Evaluation within deployment: "a3022d8f"
@@ -106,6 +111,7 @@ $ nomad job run example.nomad
 
 ```console
 $ docker ps
+
 CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                                                  NAMES
 8dd1bfd98166        redis:3.2           "docker-entrypoint.s…"   About a minute ago   Up About a minute   127.0.0.1:28646->6379/tcp, 127.0.0.1:28646->6379/udp   redis-0450729c-179f-b373-0cc9-513514275d91
 ```
@@ -115,6 +121,7 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 
 ```console
 $ nomad logs 701f3254
+
 1:C 29 Aug 06:53:41.954 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
                 _._
            _.-``__ ''-._
@@ -154,6 +161,7 @@ NomadにはJobファイルの変更により、何がどう変わるかをPlan�
 
 ```console
 $ nomad job plan example.nomad
+
 +/- Job: "example"
 +/- Stop: "true" => "false"
 +/- Task Group: "cache" (3 create)
@@ -179,6 +187,7 @@ Plan内容をみてみると、Countが１から３に変更されたことが�
 
 ```console
 $ nomad job run example.nomad
+
 ==> Monitoring evaluation "164d6cf5"
     Evaluation triggered by job "example"
     Allocation "8cf4812b" created: node "33a379fc", group "cache"
@@ -193,6 +202,7 @@ $ nomad job run example.nomad
 
 ```console
 $ docker ps
+
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                  NAMES
 94401e464ba7        redis:3.2           "docker-entrypoint.s…"   56 seconds ago      Up 55 seconds       127.0.0.1:31303->6379/tcp, 127.0.0.1:31303->6379/udp   redis-8cf4812b-c0fe-c817-acfa-3b42920743a2
 834de1552749        redis:3.2           "docker-entrypoint.s…"   56 seconds ago      Up 56 seconds       127.0.0.1:28871->6379/tcp, 127.0.0.1:28871->6379/udp   redis-bb7db1e3-c015-a9fe-1388-dd3016791e8b
@@ -204,8 +214,11 @@ Jobファイルの定義通りコンテナが３つ起動していることが�
 
 ```console
 $ docker kill 94401e464ba7
+
 94401e464ba7
-$docker ps
+
+$ docker ps
+
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                  NAMES
 834de1552749        redis:3.2           "docker-entrypoint.s…"   2 minutes ago       Up 2 minutes        127.0.0.1:28871->6379/tcp, 127.0.0.1:28871->6379/udp   redis-bb7db1e3-c015-a9fe-1388-dd3016791e8b
 a47d0ae31dd2        redis:3.2           "docker-entrypoint.s…"   2 minutes ago       Up 2 minutes        127.0.0.1:23735->6379/tcp, 127.0.0.1:23735->6379/udp   redis-b8c71633-c333-c6e9-8217-a4c0bdddf180
@@ -218,6 +231,7 @@ Nomadは裏側でその変更を監視しており、本来の「あるべき姿
 
 ```console
 $ docker ps
+
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                  PORTS                                                  NAMES
 d0d3dd071082        redis:3.2           "docker-entrypoint.s…"   1 second ago        Up Less than a second   127.0.0.1:31303->6379/tcp, 127.0.0.1:31303->6379/udp   redis-8cf4812b-c0fe-c817-acfa-3b42920743a2
 834de1552749        redis:3.2           "docker-entrypoint.s…"   2 minutes ago       Up 2 minutes            127.0.0.1:28871->6379/tcp, 127.0.0.1:28871->6379/udp   redis-bb7db1e3-c015-a9fe-1388-dd3016791e8b
@@ -229,6 +243,7 @@ Jobファイルで定義した状態に戻っています。
 
 ```console
 $ nomad job status example
+
 ID            = example
 Name          = example
 Submit Date   = 2019-08-30T13:42:31+09:00
@@ -259,6 +274,7 @@ NomadのJobを終了させるには`nomad job stop`コマンドを使います�
 
 ```console
 $ nomad job stop example
+
 ==> Monitoring evaluation "8b5de473"
     Evaluation triggered by job "example"
     Evaluation status changed: "pending" -> "complete"
