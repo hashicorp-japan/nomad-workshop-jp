@@ -9,9 +9,9 @@ Nomadは他のHashiCorp製品と同様にシングルバイナリですので、
 Nomadのバージョンが表示されるか確認してみましょう。
 
 ```console
-$ nomad version
+$ nomad -version
 
-Nomad v0.9.5 (1cbb2b9a81b5715be2f201a4650293c9ae517b87)
+Nomad v0.11.1 (1cbb2b9a81b5715be2f201a4650293c9ae517b87)
 ```
 次にDevモードでサーバーを起動してみます。
 
@@ -20,8 +20,9 @@ Nomad v0.9.5 (1cbb2b9a81b5715be2f201a4650293c9ae517b87)
 ```shell
 $ nomad agent -dev
 ```
+Nomadは通常実際のワークロードを稼働させるClientとスケジュールングなど管理系の機能を提供するServerを別オプションで起動させます。
 
-DevモードではNomadの機能を確認したりテストするのを容易にするため、サーバーととクライアント両方の特性を持って起動されます。
+DevモードではNomadの機能を確認したりテストするのを容易にするため、サーバーととクライアント両方の特性を持って起動されます。また、Devモードではリスナーやストレージの設定などがプリコンフィグレーションされています。
 
 サーバーのステータスやリストを見るには以下のコマンドを実行します。
 
@@ -40,7 +41,7 @@ ID        DC   Name                 Class   Drain  Eligibility  Status
 33a379fc  dc1  masa-mackbook.local  <none>  false  eligible     ready
 ```
 
-簡単なJobを走らせてみましょう。
+簡単なJobを実行してみましょう。
 
 NomadにはサンプルのJobファイルを作成する機能があります。
 
@@ -282,3 +283,143 @@ $ nomad job stop example
 ```
 
 終了するとNomadがAllocationしたJobがクリーンアップされます。
+
+## Nomadを通常モードで起動する
+
+次はdevモードではなく通常モードで起動します。通常モードではサーバとクライアントを分けて起動することができたり、様々な柔軟な設定を行うことが出来ます。 今回はサーバ側を1台、クライアント側を3台とする構成で試してみます。
+
+サーバ用に次のファイルを作ってください。
+
+```shell
+$ mkdir -p nomad-workshop
+$ cd nomad-workshop
+$ MY_PATH=$(pwd)
+
+$ cat << EOF > nomad-local-config-server.hcl
+data_dir  = "${MY_PATH}/local-nomad-data"
+
+bind_addr = "127.0.0.1"
+
+server {
+  enabled          = true
+  bootstrap_expect = 1
+}
+
+advertise {
+  http = "127.0.0.1"
+  rpc  = "127.0.0.1"
+  serf = "127.0.0.1"
+}
+EOF
+```
+
+次にクライアント用のファイルを作ります。今回は全てローカルで起動し、それぞれのポート番号を変更する必要があるため、三つのファイルを作ります。
+
+
+```shell
+$ cat << EOF > nomad-local-config-client-1.hcl
+
+data_dir  = "${MY_PATH}/local-cluster-data-1"
+
+bind_addr = "127.0.0.1"
+
+client {
+  enabled = true
+  servers = ["127.0.0.1:4647"]
+}
+
+advertise {
+  http = "127.0.0.1"
+  rpc  = "127.0.0.1"
+  serf = "127.0.0.1"
+}
+
+ports {
+  http = 5641
+  rpc  = 5642
+  serf = 5643
+}
+EOF
+
+$ cat << EOF > nomad-local-config-client-2.hcl
+
+data_dir  = "${MY_PATH}/local-cluster-data-2"
+
+bind_addr = "127.0.0.1"
+
+client {
+  enabled = true
+  servers = ["127.0.0.1:4647"]
+}
+
+advertise {
+  http = "127.0.0.1"
+  rpc  = "127.0.0.1"
+  serf = "127.0.0.1"
+}
+
+ports {
+  http = 5644
+  rpc  = 5645
+  serf = 5646
+}
+EOF
+
+$ cat << EOF > nomad-local-config-client-3.hcl
+
+data_dir  = "${MY_PATH}/local-cluster-data-3"
+
+bind_addr = "127.0.0.1"
+
+client {
+  enabled = true
+  servers = ["127.0.0.1:4647"]
+}
+
+advertise {
+  http = "127.0.0.1"
+  rpc  = "127.0.0.1"
+  serf = "127.0.0.1"
+}
+
+ports {
+  http = 5647
+  rpc  = 5648
+  serf = 5649
+}
+EOF
+```
+
+起動用のシェルを作ります。
+
+```shell
+$ cat << EOF > run.sh
+#!/bin/sh
+pkill nomad
+
+sleep 10
+
+nomad agent -config=${MY_PATH}/nomad-local-config-server.hcl &
+
+nomad agent -config=${MY_PATH}/nomad-local-config-client-1.hcl &
+nomad agent -config=${MY_PATH}/nomad-local-config-client-2.hcl &
+nomad agent -config=${MY_PATH}/nomad-local-config-client-3.hcl &
+EOF
+```
+
+Nomadを起動させてみましょう。
+
+```shell
+$ chmod +x run.sh
+$ ./run.sh
+```
+
+`http://localhost:4646/ui/`にブラウザでアクセスし、一つのサーバと三つのクライアントが起動していることを確認してください。
+
+これ以降、この環境を使ってNomadの様々な機能を試していきます。
+
+##参考リンク
+
+https://www.nomadproject.io/docs/internals/architecture.html
+https://www.nomadproject.io/docs/configuration/index.html
+
