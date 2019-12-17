@@ -420,6 +420,6 @@ $ ./run.sh
 
 ##参考リンク
 
-*[Nomad Architecture(https://www.nomadproject.io/docs/internals/architecture.html)
-*[Nomad Agent Configuration](https://www.nomadproject.io/docs/configuration/index.html)
+* [Nomad Architecture(https://www.nomadproject.io/docs/internals/architecture.html)
+* [Nomad Agent Configuration](https://www.nomadproject.io/docs/configuration/index.html)
 
