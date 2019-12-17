@@ -291,7 +291,7 @@ $ nomad job stop example
 サーバ用に次のファイルを作ってください。
 
 ```shell
-$ mkdir -p nomad-workshop
+$ mkdir nomad-workshop
 $ cd nomad-workshop
 $ MY_PATH=$(pwd)
 
@@ -418,8 +418,8 @@ $ ./run.sh
 
 これ以降、この環境を使ってNomadの様々な機能を試していきます。
 
-##参考リンク
+## 参考リンク
 
-* [Nomad Architecture(https://www.nomadproject.io/docs/internals/architecture.html)
+* [Nomad Architecture](https://www.nomadproject.io/docs/internals/architecture.html)
 * [Nomad Agent Configuration](https://www.nomadproject.io/docs/configuration/index.html)
 
