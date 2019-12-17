@@ -1,7 +1,7 @@
 ## アジェンダ
 * [初めてのNomad](contents/hello_nomad.md)
+* [Nomad用語集](contents/words.md)
 * アプリケーションのデプロイメント
-	* [用語集](contents/words.md)
 	* [Docker](contents/docker.md)
 	* [Exec](contents/exec.md)
 	* [Java](contents/java.md)
