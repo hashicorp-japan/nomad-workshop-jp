@@ -1,4 +1,4 @@
-# Hashicorp Nomad Workshop
+# HashiCorp Nomad Workshop
 
 [Nomad](https://www.nomadproject.io/)はHashiCorpが中心に開発をするOSSのオーケストレーションツールです。軽量なアーキテクチャかつ幅広いタイプのアプリケーションに対応し、高度なオーケストレーション機能を提供しつつシンプルな運用モデルを提供します。Nomadはマルチプラットフォームでかつ全ての機能をHTTP APIで提供しているため、環境やクライアントを問わず利用することができます。また、VaultやConsulなどのHashiCorp製品と連携することで、ロードバランシング、Service Discoveryやシークレット管理など高度なプラットフォームとしての機能を持たせることも可能です。
 
