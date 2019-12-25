@@ -74,24 +74,28 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 9072cdae373f        mysql:5.7.28        "docker-entrypoint.s…"   About an hour ago   Up About an hour    192.168.3.183:3306->3306/tcp, 192.168.3.183:3306->3306/udp, 33060/tcp   mysql-task-9752bf56-26bf-1f39-ae69-e53b654521c9
 ```
 
-試しにログインしてみましょう。IPアドレスは環境によって異なります。上の出力結果のものをコピーしてください。
+ログインしてみましょう。IPアドレスは環境によって異なります。上の出力結果のものをコピーしてください。
 
 ```console
 $ mysql -u root -p -h192.168.3.183
 Enter password:rooooot
 ```
 
-試しにデータを投入して再起動してみましょう。
+## Persistence Diskを扱う
+
+次にデータを永続化するためのPersistence Diskの設定を行います。まずそのままの状態で試しにデータを書き込んで再起動し、データが永続化されていないことを確認してみます。
+
+データを投入して再起動してみましょう。
 
 ```
 mysql> create database handson;
 mysql> show databases;
 ```
 
-Nomad Jobを再起動します。
+この状態でNomad Jobを再起動します。現在はNomadにストレージの設定を行っておらずJobは永続ディスクを持っていません。そのため、再起動するとデータは揮発するはずです。
 
 ```shell
-$ nomad job stop mysql.nomad
+$ nomad job stop mysql-5.7
 $ nomad job run mysql.nomad
 ```
 
@@ -105,9 +109,7 @@ $ mysql -u root -p -h192.168.3.183
 mysql> show databases;
 ```
 
-先ほど作成した`handson`データベースは消えているでしょう。Dockerを使いつつ、このようなデータベースなどディスクが要求されるStatefulなワークロードを扱うにはNomadの`volume`機能を利用します。
-
-## Persistence Diskを扱う
+先ほど作成した`handson`データベースは消えているでしょう。Dockerを使いつつ、データベースなどディスクが要求されるStatefulなワークロードを扱うにはNomadの`volume`機能を利用します。
 
 Persistent Diskを使うためには
 
