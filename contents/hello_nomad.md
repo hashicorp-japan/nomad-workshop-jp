@@ -6,6 +6,14 @@
 
 Nomadは他のHashiCorp製品と同様にシングルバイナリですので、ダウンロードしたバイナリにPathを通すだけで使用可能です。
 
+```console
+$ unzip nomad*.zip
+$ chmod + x nomad
+$ mv nomad /usr/local/bin
+$ nomad -version
+Nomad v0.10.0 (25ee121d951939504376c70bf8d7950c1ddb6a82)
+```
+
 Nomadのバージョンが表示されるか確認してみましょう。
 
 ```console
