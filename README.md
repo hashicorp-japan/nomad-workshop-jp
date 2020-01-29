@@ -22,14 +22,12 @@
 ## アジェンダ
 * [初めてのNomad](contents/hello_nomad.md)
 * [Nomad 用語集](contents/words.md)
-* nomad cli
+* [nomad cli](contents/cli.md)
 * Task Drivers
-	* [Docker](contents/docker.md)
-	* [Java](contents/java.md)
-	* Exec
-	* Raw Exec
+	* [Docker](contents/docker.md)(+ Volume)
+	* [Java](contents/java.md)(+ Artifact & Logs)
+	* [Exec](contents/exec.md)(+ Affinity & Spread)
 * Schedulers
-	* Service
 	* Batch
 	* System
 * [アプリケーションのアップデート](contents/app_update.md)
