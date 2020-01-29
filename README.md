@@ -25,7 +25,7 @@
 * nomad cli
 * Task Drivers
 	* [Docker](contents/docker.md)
-	* Java
+	* [Java](contents/java.md)
 	* Exec
 	* Raw Exec
 * Schedulers
