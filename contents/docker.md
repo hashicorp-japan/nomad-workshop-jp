@@ -253,3 +253,5 @@ MySQLのデータがホストに保存されていることがわかるはずで
 ### 参考リンク
 * [Drivers](https://www.nomadproject.io/docs/drivers/index.html)
 * [Docker Driver](https://www.nomadproject.io/docs/drivers/docker.html)
+* [Volume Configuration](https://www.nomadproject.io/docs/job-specification/volume.html)
+* [Volume Mount Configuration](https://www.nomadproject.io/docs/job-specification/volume_mount.html)
