@@ -24,9 +24,9 @@
 * [Nomad 用語集](contents/words.md)
 * [nomad cli](contents/cli.md)
 * Task Drivers
-	* [Docker](contents/docker.md)(+ Volume)
-	* [Java](contents/java.md)(+ Artifact & Logs)
-	* [Exec](contents/exec.md)(+ Affinity & Spread)
+	* [Docker](contents/docker.md) (+ Volume)
+	* [Java](contents/java.md) (+ Artifact & Logs)
+	* [Exec](contents/exec.md) (+ Affinity & Spread)
 * Schedulers
 	* Batch
 	* System
