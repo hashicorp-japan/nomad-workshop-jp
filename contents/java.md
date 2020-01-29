@@ -8,7 +8,7 @@ NomadではDockerのようなコンテナのワークロードにとどまらず
 
 ## Java Task Driverを扱う
 
-JAva Task Driverはその名の通り、Javaアプリケーションを実行させるためのDriverです。これを利用することでDocker Imageのpullや実行させるために必要なVolumeやネットワークの設定を宣言的に行うことが可能です。
+Java Task Driverはその名の通り、Javaアプリケーションを実行させるためのDriverです。これを利用することでDocker Imageのpullや実行させるために必要なVolumeやネットワークの設定を宣言的に行うことが可能です。
 
 まず一つ簡単なJavaアプリをNomad上で稼働させてみましょう。**ローカルにJavaがインストールされていることを確認してください。**
 
