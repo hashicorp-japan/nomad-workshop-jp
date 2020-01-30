@@ -323,7 +323,6 @@ EOF
 
 次にクライアント用のファイルを作ります。今回は全てローカルで起動し、それぞれのポート番号を変更する必要があるため、三つのファイルを作ります。
 
-
 ```shell
 $ cat << EOF > nomad-local-config-client-1.hcl
 
@@ -404,6 +403,7 @@ EOF
 $ cat << EOF > run.sh
 #!/bin/sh
 pkill nomad
+pkill java
 
 sleep 10
 
