@@ -621,7 +621,7 @@ EOF
 起動してみます。
 
 ```console
-job run exec-constraint.nomad
+$ nomad job run exec-constraint.nomad
 ==> Monitoring evaluation "b5edcaa7"
     Evaluation triggered by job "hello-exec-batch"
     Allocation "48154342" created: node "6477d9ed", group "example"
@@ -647,4 +647,4 @@ job run exec-constraint.nomad
 * [Exec Driver](https://www.nomadproject.io/docs/drivers/exec.html)
 * [Spread Configuration](https://www.nomadproject.io/docs/job-specification/spread.html)
 * [Affinity Configuration](https://www.nomadproject.io/docs/job-specification/affinity.html)
-* [](https://www.nomadproject.io/docs/runtime/interpolation.html#interpreted_node_vars)
+* [Interpreted Variables](https://www.nomadproject.io/docs/runtime/interpolation.html#interpreted_node_vars)
