@@ -14,6 +14,8 @@
 	* Docker
 	* Java 12(いつか直します...)
 	* jq, watch, wget, curl
+	* PHP
+	* Go
 
 ## 資料
 
