@@ -28,7 +28,7 @@
 * Task Drivers
 	* [Docker](contents/docker.md) (+ Volume)
 	* [Java](contents/java.md) (+ Artifact & Logs)
-	* [Exec](contents/exec.md) (+ Affinity & Spread & Constraintg)
+	* [Exec](contents/exec.md) (+ Affinity & Spread & Constraint)
 * Schedulers
 	* Batch
 	* System
