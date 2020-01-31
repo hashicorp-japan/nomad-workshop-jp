@@ -424,6 +424,20 @@ $ ./run.sh
 
 `http://localhost:4646/ui/`にブラウザでアクセスし、一つのサーバと三つのクライアントが起動していることを確認してください。
 
+試しに先ほどと同じジョブを起動させて見ます。
+
+```console
+$ nomad job run example.nomad
+==> Monitoring evaluation "164d6cf5"
+    Evaluation triggered by job "example"
+    Allocation "8cf4812b" created: node "33a379fc", group "cache"
+    Allocation "b8c71633" created: node "33a379fc", group "cache"
+    Allocation "bb7db1e3" created: node "33a379fc", group "cache"
+    Allocation "bb7db1e3" status changed: "pending" -> "running" (Tasks are running)
+    Evaluation status changed: "pending" -> "complete"
+==> Evaluation "164d6cf5" finished with status "complete"
+```
+
 これ以降、この環境を使ってNomadの様々な機能を試していきます。
 
 ## 参考リンク
