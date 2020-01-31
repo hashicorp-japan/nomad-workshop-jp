@@ -125,14 +125,14 @@ $ mkdir /tmp/mysql
 $ cd nomad-workshop
 ```
 
-`nomad-local-config-client-1.hcl`,`nomad-local-config-client-2.hcl`,`nomad-local-config-client-3.hcl`の各ファイルの`client`の項目を下記のように上書きして下さい。他はそのままです。
+`nomad-local-config-client-1.hcl`,`nomad-local-config-client-2.hcl`,`nomad-local-config-client-3.hcl`の各ファイルの`client`の項目を下記のように上書きして下さい。他はそのままです。`<DIR>`はカレントディレクトリの絶対パスに置き換えて下さい。
 
 ```hcl
 client {
   enabled = true
   servers = ["127.0.0.1:4647"]
   host_volume "mysql-vol" {
-    path = "/tmp/mysql"
+    path = <DIR>/mysql-data
     read_only = false
   }
 }
