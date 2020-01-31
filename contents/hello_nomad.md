@@ -438,6 +438,10 @@ $ nomad job run example.nomad
 ==> Evaluation "164d6cf5" finished with status "complete"
 ```
 
+ここで表示される
+* `Allocation`はメモしておいて下さい(上の例だと`bb7db1e3`)。
+* `Evaluation`はメモしておいて下さい(上の例だと`164d6cf5`)。
+
 これ以降、この環境を使ってNomadの様々な機能を試していきます。
 
 ## 参考リンク
