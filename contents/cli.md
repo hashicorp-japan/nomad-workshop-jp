@@ -636,6 +636,7 @@ $ nomad inspect example
     }
 }
 ```
+</details>
 
 その他にも`run`, `stop`などジョブの起動停止を行うようなコマンドやイベント処理をinvokeする`dispatch`、ジョブをCanaryでプロモーションするための`promote`など様々な操作を`job`コマンドを利用して行います。
 
