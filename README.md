@@ -26,12 +26,12 @@
 * [Nomad 用語集](contents/words.md)
 * [nomad cli](contents/cli.md)
 * Task Drivers
-	* [Docker](contents/docker.md) (+ Volume)
-	* [Java](contents/java.md) (+ Artifact & Logs)
-	* [Exec](contents/exec.md) (+ Affinity & Spread & Constraint)
+	* [Docker Task Driver](contents/docker.md) (+ Volume)
+	* [Java Task Driver](contents/java.md) (+ Artifact & Logs)
+	* [Exec Task Driver](contents/exec.md) (+ Affinity & Spread & Constraint)
 * Schedulers
-	* Batch
-	* System
+	* Batch Scheduler
+	* System Scheduler
 * [アプリケーションのアップデート](contents/app_update.md)
 * HashiCorp Consulとの連携
 * HashiCorp Vaultとの連携
