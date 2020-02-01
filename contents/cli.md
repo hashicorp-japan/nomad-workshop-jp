@@ -640,6 +640,20 @@ $ nomad inspect example
 
 その他にも`run`, `stop`などジョブの起動停止を行うようなコマンドやイベント処理をinvokeする`dispatch`、ジョブをCanaryでプロモーションするための`promote`など様々な操作を`job`コマンドを利用して行います。
 
+## monitor
+
+`monitor`コマンドはNomadエージェントのログを取得するためのコマンドで、デバッグログなどを確認したいときにとても便利です。
+
+```console
+$ nomad monitor -log-level=DEBUG
+2020-02-01T23:38:02.316+0900 [WARN]  nomad: raft: Heartbeat timeout from "" reached, starting election
+2020-02-01T23:38:02.316+0900 [INFO]  nomad: raft: Node at 127.0.0.1:4647 [Candidate] entering Candidate state in term 34
+2020-02-01T23:38:02.353+0900 [DEBUG] nomad: raft: Votes needed: 1
+2020-02-01T23:38:02.353+0900 [DEBUG] nomad: raft: Vote granted from 127.0.0.1:4647 in term 34. Tally: 1
+```
+
+`-node-id`や`-server-id`でログを絞ったり、`-json`でJSON形式でログを出力することも可能です。
+
 ## その他のコマンド
 
 そのほかに`namespace`, `quota`や`sentinel`などエンタープライズ版のみ利用可能なコマンドも用意されています。この辺りは`Enterprise機能の紹介`のスライドで確認してみて下さい。
