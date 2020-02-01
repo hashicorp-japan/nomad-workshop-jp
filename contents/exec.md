@@ -101,7 +101,7 @@ func main() {
         http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
                 fmt.Fprint(w, "Hello World! Go is running on Nomad")
         })
-        http.ListenAndServe(":"+"7777", nil)
+        http.ListenAndServe(":"+"8080", nil)
 }
 EOF
 ```
