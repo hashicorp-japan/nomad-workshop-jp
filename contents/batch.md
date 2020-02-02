@@ -418,6 +418,12 @@ Hi Nomad Periodic Scheduler
 
 を実行させてみました。Nomadではこのように`Batch Scheduler`を使って様々なワークロードを稼働させることが可能です。
 
+最後にジョブを停止しておきましょう。
+
+```shell
+$ nomad job stop periodic-echo
+```
+
 ## 参考リンク
 * [Batch Schduler](https://www.nomadproject.io/docs/schedulers.html#batch)
 * [Batch Job Example](https://www.nomadproject.io/docs/job-specification/job.html#batch-job)
