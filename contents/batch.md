@@ -298,7 +298,7 @@ $ cat decrypted.txt
 
 試してみましょう。
 
-```console
+```shell
 $ cat << EOF > periodic-echo.nomad
 job "periodic-echo" {
   datacenters = ["dc1"]
