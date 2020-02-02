@@ -422,6 +422,8 @@ Hi Nomad Periodic Scheduler
 
 ```shell
 $ nomad job stop periodic-echo
+$ nomad job stop hello-java-batch
+$ nomad job stop parameterized-encrypter
 ```
 
 ## 参考リンク
