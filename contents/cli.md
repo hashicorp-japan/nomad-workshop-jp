@@ -435,7 +435,7 @@ ID        Node ID   Task Group  Version  Desired  Status   Created     Modified
 3761cbaf  4b635091  cache       0        stop     failed   53m32s ago  43m48s ago
 ```
 
-`inspect`はNomadのジョブの情報の詳細を取得するためのコマンドです。
+`inspect`はNomadのジョブの情報の詳細を取得するためのコマンドです。また、結果をJSONで欲しい時も使います。`nomad job status`では`-json`オプションではなく`inspect`を使うようです。
 
 ```shell
 $ nomad inspect example
