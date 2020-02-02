@@ -68,7 +68,7 @@ EOF
 
 ここでは`batch`タイプのジョブを`java`のドライバを利用して実行する定義をしています。このジョブを実際に稼働させてみましょう。
 
-```shell
+```console
 $ nomad job run hello-java-batch.nomad
 ==> Monitoring evaluation "87f0bff4"
     Evaluation triggered by job "hello-java-batch"
@@ -299,7 +299,7 @@ $ cat decrypted.txt
 試してみましょう。
 
 ```console
-cat << EOF > periodic-echo.nomad
+$ cat << EOF > periodic-echo.nomad
 job "periodic-echo" {
   datacenters = ["dc1"]
   type = "batch"
