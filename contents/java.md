@@ -4,7 +4,7 @@ NomadではDockerのようなコンテナのワークロードにとどまらず
 
 各Taskはクライアント上の`Task Driver`によってリソースがIsolationされ実行されます。Task Driverはプラガブルで、各ドライバーの定義はJob定義のTaskn内の`plugin stanza`で設定します。
 
-ここではいくつかのJavaアプリケーションをNomad上で動かしてみます。また、この章ではログフォワーディングも試してみます。
+ここではいくつかのJavaアプリケーションをNomad上で動かしてみます。また、この章ではNomadでのログ管理も試してみます。
 
 ## Java Task Driverを扱う
 
