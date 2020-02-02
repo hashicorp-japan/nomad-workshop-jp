@@ -403,7 +403,7 @@ Evaluation "0d142ec3" waiting for additional capacity to place remainder
 
 `status`はよく利用します。ジョブの状態やジョブに紐づくアロケーションIDを確認することが出来ます。
 
-```
+```console
 $ nomad job status example
 ID            = example
 Name          = example
@@ -659,6 +659,12 @@ $ nomad monitor -log-level=DEBUG
 そのほかに`namespace`, `quota`や`sentinel`などエンタープライズ版のみ利用可能なコマンドも用意されています。この辺りは`Enterprise機能の紹介`のスライドで確認してみて下さい。
 
 また`operator`コマンドに関しては[Consul Workshop](https://github.com/hashicorp-japan/consul-workshop/blob/master/contents/cli.md)に同様の仕組みの解説と手順が載っているので興味のある方は試してみて下さい。
+
+最後にジョブを停止しておきましょう。
+
+```shell
+$ nomad job stop example
+```
 
 ## 参考リンク
 * [nomad cli](https://www.nomadproject.io/docs/commands/index.html)

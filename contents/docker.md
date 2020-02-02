@@ -16,6 +16,7 @@ Docker Task Driverはその名の通り、Docker Imageを実行させるため�
 
 ```shell
 $ cd nomad-workshop
+$ export DIR=$(pwd)
 $ cat << EOF > mysql.nomad
 job "mysql-5.7" {
   datacenters = ["dc1"]
@@ -121,8 +122,8 @@ Persistent Diskを使うためには
 まずはClient側の設定をします。
 
 ```shell
-$ mkdir /tmp/mysql
 $ cd nomad-workshop
+$ mkdir mysql-data
 ```
 
 `nomad-local-config-client-1.hcl`,`nomad-local-config-client-2.hcl`,`nomad-local-config-client-3.hcl`の各ファイルの`client`の項目を下記のように上書きして下さい。他はそのままです。`<DIR>`はカレントディレクトリの絶対パスに置き換えて下さい。
@@ -239,7 +240,7 @@ mysql> show databases;
 `handson`のデータが残っていることがわかるはずです。また、ホストのディレクトリを見てみましょう。
 
 ```console
-$ ls /tmp/mysql
+$ mkdir mysql-data
 auto.cnf           client-key.pem     ib_logfile1        performance_schema server-key.pem
 ca-key.pem         handson            ibdata1            private_key.pem    sys
 ca.pem             ib_buffer_pool     ibtmp1             public_key.pem
@@ -249,6 +250,12 @@ client-cert.pem    ib_logfile0        mysql              server-cert.pem
 MySQLのデータがホストに保存されていることがわかるはずです。またVolumeのタイプは現時点では`host_volume`のみの対応となっており、今後その他ストレージもサポートしていく予定になっています。
 
 ここではDocker Driverの基本とPersistence Diskの設定を行いましたが、まだまだ様々な設定を行いことができます。
+
+最後にジョブを停止しておきましょう。
+
+```shell
+$ nomad job stop mysql-5.7
+```
 
 ### 参考リンク
 * [Drivers](https://www.nomadproject.io/docs/drivers/index.html)

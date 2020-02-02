@@ -65,7 +65,7 @@ $ nomad job run exec.nomad
 さて、実行結果は標準出力に吐かれているため、ログの中を確認して見ましょう。以下のコマンドで`Application ID`を取得して下さい。一番した方に出力されているはずです。
 
 ```shell
-$ nomad job status -verbose  hello-exec-batch
+$ nomad job status -verbose hello-exec-batch
 ```
 
 取得した`Application ID`上のログを見ると`echo`で出力したテキストがログとして残っているでしょう。
@@ -186,6 +186,13 @@ Hello World! PHP is running on Nomad
 今まで同様にアプリケーションがNomad上で稼働していることがわかります。以上のようにNomadではDockerコンテナ化されたアプリケーションやJavaアプリケーションを専用のドライバーで稼働させることのみならず、コンテナ化されてないようなアプリケーションも簡単に稼働させられることがわかりました。
 
 Nomadはコンテナのエコシステムを最大限利用できる一方、簡単なスクリプト、バッチ処理やあらゆるWebのワークロードも実行させることが出来ます。
+
+最後にジョブを停止しておきましょう。
+
+```shell
+$ nomad job stop hello-exec-go-web
+$ nomad job stop hello-exec-php-web
+```
 
 ## SpreadとAffinityとConstraintでJobのデプロイを制御する
 
@@ -376,7 +383,6 @@ $ nomad job run exec-spread.nomad
 
 ```console
 $ nomad job status hello-exec-batch
-nomad job status hello-exec-batch                                                            
 
 ~~~~~
 
@@ -447,7 +453,6 @@ $ nomad job run exec-spread.nomad
 
 ```console
 $ nomad job status hello-exec-batch
-nomad job status hello-exec-batch                                                            
 
 ~~~~~
 
@@ -488,7 +493,7 @@ Affinityは条件にマッチしない場合稼働出来るものは稼働する
 
 1. カーネルバージョンでの指定
 
-```
+```hcl
 affinity {
   attribute = "${attr.kernel.version}"
   operator  = "version"
@@ -499,7 +504,7 @@ affinity {
 
 2. OSでの指定(複数条件がある際は`weight`で優先度を決める)
 
-```
+```hcl
 affinity {
   attribute = "${attr.os.name}"
   operator  = "="
@@ -517,7 +522,7 @@ affinity {
 
 3. AWSインスタンサイズでの指定
 
-```
+```hcl
 affinity {
   attribute = "${attr.platform.aws.instance-type}"
   operator = "regexp"

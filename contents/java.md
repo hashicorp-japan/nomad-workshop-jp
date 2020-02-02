@@ -213,6 +213,7 @@ ID        Node ID   Task Group  Version  Desired  Status    Created     Modified
 
 ```console
 $ export NODE_ID=4b635091
+$ export ALLOC=50fbdd29
 $ nomad node status -verbose -json ${NODE_ID} | jq -r '.HTTPAddr'
 127.0.0.1:5641
 ```
@@ -225,13 +226,17 @@ $ nomad node status -verbose -json ${NODE_ID} | jq -r '.HTTPAddr'
 ログのファイルは各アロケーションの`alloc/logs`以下に保存されています。
 
 ```shell
-$ ls alloc/<ALLOCATION>/alloc/logs
+$ ls alloc/${ALLOC}/alloc/logs
 webservice.stderr.0 webservice.stdout.0
 ```
 
 `ALLOCATION`が複数ある場合は、先ほどメモしたAllocation IDが接頭辞になっているディレクトリを選択します。ここの例だと`50fbdd29-************`です。
 
 `stderr.0`と`stdout.0`とあることがわかるでしょう。`stdout.0`の方を見ると、起動ログと以下のようなアプリログが確認できるはずです。
+
+```shell
+$ nomad fs ${ALLOC}/alloc/logs/stdout.0
+```
 
 ```
 2020-01-29 21:21:43.227  INFO 43147 --- [nio-7070-exec-3] com.example.demo.SimplestWeb             : API has been called!!
@@ -250,6 +255,12 @@ logs {
 ```
 
 このように記述することで最大保管するファイル数と1ファイルの最大`MB`数を指定することができます。
+
+最後にジョブを停止しておきましょう。
+
+```shell
+$ nomad job stop hello-web-java
+```
 
 ### 参考リンク
 * [Java Driver](https://www.nomadproject.io/docs/drivers/java.html)
