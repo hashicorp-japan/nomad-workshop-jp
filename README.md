@@ -13,7 +13,7 @@
 	* Nomad
 	* Docker
 	* Java 12(いつか直します...)
-	* jq, watch, wget, curl
+	* jq, watch, wget, curl, openssl
 	* PHP
 	* Go
 
@@ -30,9 +30,10 @@
 	* [Java Task Driver](contents/java.md) (+ Artifact & Logs)
 	* [Exec Task Driver](contents/exec.md) (+ Affinity & Spread & Constraint)
 * Schedulers
-	* Batch Scheduler
+	* [Batch Scheduler](contents/batch.md)
 	* System Scheduler
 * [アプリケーションのアップデート](contents/app_update.md)
 * HashiCorp Consulとの連携
 * HashiCorp Vaultとの連携
+* Enterprise版機能の紹介
 
