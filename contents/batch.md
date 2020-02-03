@@ -163,7 +163,7 @@ job "parameterized-encrypter" {
 EOF
 ```
 
-`type`に`batch`を指定し、ジョブスタンザないに`prameterized`の設定を入れ`Prameterized Job`を有効化しています。インプットにはペイロードやメタデータを扱うことが出来ますが、まずはペイロードのみ`required`としています。
+`type`に`batch`を指定し、ジョブスタンザ内に`prameterized`の設定を入れ`Prameterized Job`を有効化しています。インプットにはペイロードやメタデータを扱うことが出来ますが、まずはペイロードのみ`required`としています。
 
 タスクスタンザ内が実際のタスクの定義で今回は`openssl`コマンドを使って入力された値を暗号化するとても簡単なタスクです。復号化に必要なパスワードのファイルは簡易的にパブリックアクセス可能なS3に保存されており、それを`artifact`で取得しています。
 
@@ -348,7 +348,7 @@ Approximate next launch time: 2020-02-02T13:04:00+09:00 (22s from now)
 別のターミナルを立ち上げて以下のコマンドを実行してください。
 
 ```console
-watch -n 1 nomad job status periodic-echo
+$ watch -n 1 nomad job status periodic-echo
 
 ID                   = periodic-echo
 Name                 = periodic-echo
