@@ -11,7 +11,7 @@ Nomadではアプリケーションを設定ベースでアップデートする
 最初に題材となるアプリをデプロイします。以下のようなJobファイルを準備します。
 
 ```shell
-cat << EOF > my-first-update.nomad
+$ cat << EOF > my-first-update.nomad
 job "update-demo-webapp" {
   datacenters = ["dc1"]
 
@@ -48,7 +48,7 @@ EOF
 それでは以下のコマンドでデプロイしてみましょう。
 
 ```shell
-nomad run demo-webapp.nomad
+$ nomad run demo-webapp.nomad
 ```
 
 Jobが起動したか以下のコマンドで確認してみましょう。
@@ -208,7 +208,7 @@ $ nomad run my-first-update-v2.nomad
 再度アプリケーションのIPアドレスとポートを確認してアクセスしてみます。
 
 ```console
-$ curl http://172.20.10.4:23049 kabu@/Users/kabu/hashicorp/nomad
+$ curl http://172.20.10.4:23049
 <!DOCTYPE html>
 <html>
 <body>
@@ -225,7 +225,7 @@ $ curl http://172.20.10.4:23049 kabu@/Users/kabu/hashicorp/nomad
 次はローリングアップデートで設定できる項目をいくつか利用してアップデートしてみたいと思います。今回は便宜上コンテナとしては`v2`から`v1`への切り戻しを行いますが、バージョンアップだと想定してください。(出力文字列が変わっているだけです。)
 
 ```shell
-cat << EOF > my-first-update-v3.nomad
+$ cat << EOF > my-first-update-v3.nomad
 job "update-demo-webapp" {
   datacenters = ["dc1"]
 
@@ -330,7 +330,7 @@ $ nomad job run my-first-update-v3.nomad
 まず意図的に起動しないアプリへアップデートを試してみます。ここでは便宜上全く別のダミーアプリへのバージョンアップをしていますが、気にしないでください(同じアプリでうまく起動しないものと想定してください)。
 
 ```shell
-cat << EOF > my-first-update-v4.nomad
+$ cat << EOF > my-first-update-v4.nomad
 job "update-demo-webapp" {
   datacenters = ["dc1"]
 
@@ -425,7 +425,7 @@ f4095268  4b635091  update-demo-webapp  3        run      running   1m24s ago  1
 次に定義ファイルを更新して正常にCanaryアップデートを試してみます。
 
 ```shell
-cat << EOF > my-first-update-v5.nomad
+$ cat << EOF > my-first-update-v5.nomad
 job "update-demo-webapp" {
   datacenters = ["dc1"]
 
