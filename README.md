@@ -33,7 +33,7 @@
 	* [Batch Scheduler](contents/batch.md)
 	* System Scheduler
 * [アプリケーションのアップデート](contents/app_update.md)
-* HashiCorp Consulとの連携
+* [HashiCorp Consulとの連携](contents/nomad-consul.md)
 * HashiCorp Vaultとの連携
-* Enterprise版機能の紹介
+* [Enterprise版機能の紹介](https://docs.google.com/presentation/d/1pNWXiETt9t5gOQY3dsvuQJJc0adzW9SEq6U73UhZIVI/edit?usp=sharing)
 
