@@ -647,6 +647,12 @@ $ nomad job run exec-constraint.nomad
 
 このようにNomadでは混在の環境でもJobを安全に実行するためのスケージューリングをサポートするための機能も充実しています。
 
+最後にジョブを停止しておきましょう。
+
+```shell
+$ nomad job stop hello-exec-batch
+```
+
 ## 参考リンク
 * [Raw Exec Driver](https://www.nomadproject.io/docs/drivers/raw_exec.html)
 * [Exec Driver](https://www.nomadproject.io/docs/drivers/exec.html)

@@ -623,6 +623,12 @@ f67715ee  8f5984b6  update-demo-webapp  3        stop     complete  7m30s ago  3
 
 この辺りは`HashiCorp Consulとの連携`の章で試してみたいと思います。
 
+最後にジョブを停止しておきましょう。
+
+```shell
+$ nomad job stop update-demo-webapp
+```
+
 ## 参考リンク
 * [Nomad Job Lifecycle](https://www.hashicorp.com/blog/building-resilient-infrastructure-with-nomad-job-lifecycle/)
 * [Rolling Upgrades](https://www.nomadproject.io/guides/operating-a-job/update-strategies/rolling-upgrades.html)
