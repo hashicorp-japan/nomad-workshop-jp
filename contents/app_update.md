@@ -200,6 +200,8 @@ update {
 $ watch -n 1 nomad job status update-demo-webapp
 ```
 
+元の端末に戻り下記を実行します。
+
 ```shell
 $ nomad run my-first-update-v2.nomad
 ```
@@ -504,7 +506,7 @@ potentially invalid.
 プラン内容を確認したらジョブをデプロイしてみます。
 
 ```shell
-$ nomad job plan my-first-update-v5.nomad
+$ nomad job run my-first-update-v5.nomad
 ```
 
 `watch`の出力結果を見ると`running`の10インスタンスとは別に`canary`で指定した3インスタンスが新たに稼働しているでしょう。今度は`running`になっているはずです。
@@ -613,7 +615,9 @@ e5afef9f  4b635091  update-demo-webapp  3        stop     complete  7m30s ago  3
 f67715ee  8f5984b6  update-demo-webapp  3        stop     complete  7m30s ago  3m46s ago
 ```
 
-これでCanaryアップデートは完了です。
+これでアップデートの内容は完了です。
+
+この他に`auto_revert`で失敗したら自動で最新の安定のバージョンに切り戻す機能や`auto_promotion`で`canary`が成功したら自動でプロモーションするような設定も可能です。
 
 以上のようにNomadでは設定ベースでのアップデートのスケジューリングをシンプルに実行できることがわかりました。Consulのヘルスチェックの機能と組み合わせることでさらに高度な設定が可能です。
 
