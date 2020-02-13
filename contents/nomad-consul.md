@@ -294,6 +294,8 @@ $ pkill nomad
 
 ## Sidecarを利用するアプリのデプロイ
 
+**この手順はLinux上のみで実行可能です。**
+
 次にConsul ConnectのSidecar Proxyを利用したアプリをどのようにNomadから定義して実行するかを試してみます。Consul Connectを利用するためにはCNI Pluginを有効化する必要があります。
 
 [こちら](https://nomadproject.io/guides/integrations/consul-connect/#cni-plugins)の手順でインストールをして下さい。
