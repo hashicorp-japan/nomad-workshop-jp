@@ -34,6 +34,6 @@
 	* System Scheduler
 * [アプリケーションのアップデート](contents/app_update.md)
 * [HashiCorp Consulとの連携](contents/nomad-consul.md)
-* HashiCorp Vaultとの連携
+* [HashiCorp Vaultとの連携]((contents/nomad-vault.md))
 * [Enterprise版機能の紹介](https://docs.google.com/presentation/d/1pNWXiETt9t5gOQY3dsvuQJJc0adzW9SEq6U73UhZIVI/edit?usp=sharing)
 
