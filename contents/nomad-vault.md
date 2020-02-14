@@ -6,7 +6,7 @@ Vaultとの連携はNomadの設定ベースで行うことができます。Vaul
 
 まずはVaultをインストールして起動してみましょう。
 
-## Consulのインストール
+## Vaultのインストール
 
 [こちら](https://www.vaultproject.io/downloads/)のWebサイトからご自身のOSに合ったものをダウンロードしてください。
 
