@@ -273,8 +273,8 @@ Key                Value
 lease_id           aws/creds/s3-role/BFQnLnRUU3KQAAgYrutelON0
 lease_duration     48h
 lease_renewable    true
-access_key         
-secret_key         
+access_key         ***************
+secret_key         ***************
 security_token     <nil>
 ```
 
