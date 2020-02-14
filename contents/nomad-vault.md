@@ -126,7 +126,7 @@ $ ./run-vault-local.sh
 
 これでVaultとNomadサーバの連携の設定が完了し、Vaultトークンを動的に発行できるようになりました。
 
-##　Vault側の設定
+## Vault側の設定
 
 次にVault側の設定を行います。今回の例ではNomadサーバが発行したトークンを利用して、Vault経由でアプリからAWSのキーを発行します。そのためVaultにAWSのAPIを実行させるための設定を行います。
 
