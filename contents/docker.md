@@ -75,7 +75,37 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 9072cdae373f        mysql:5.7.28        "docker-entrypoint.s…"   About an hour ago   Up About an hour    192.168.3.183:3306->3306/tcp, 192.168.3.183:3306->3306/udp, 33060/tcp   mysql-task-9752bf56-26bf-1f39-ae69-e53b654521c9
 ```
 
-ログインしてみましょう。IPアドレスは環境によって異なります。上の出力結果のものをコピーしてください。
+```console
+$ nomad job status mysql-5.7
+ID            = mysql-5.7
+Name          = mysql-5.7
+Submit Date   = 2020-02-19T05:30:16Z
+Type          = service
+Priority      = 50
+Datacenters   = dc1
+Status        = running
+Periodic      = false
+Parameterized = false
+
+Summary
+Task Group   Queued  Starting  Running  Failed  Complete  Lost
+mysql-group  0       0         1        0       0         0
+
+Latest Deployment
+ID          = a85e7c45
+Status      = successful
+Description = Deployment completed successfully
+
+Deployed
+Task Group   Desired  Placed  Healthy  Unhealthy  Progress Deadline
+mysql-group  1        1       1        0          2020-02-19T05:40:39Z
+
+Allocations
+ID        Node ID   Task Group   Version  Desired  Status   Created  Modified
+fc0c5fcf  31528bd6  mysql-group  0        run      running  27s ago  4s ago
+```
+
+ログインしてみましょう。IPアドレスは環境によって異なります。`docker ps`の出力結果のものをコピーしてください。
 
 ```console
 $ mysql -u root -p -h192.168.3.183
@@ -126,14 +156,14 @@ $ cd nomad-workshop
 $ mkdir mysql-data
 ```
 
-`nomad-local-config-client-1.hcl`,`nomad-local-config-client-2.hcl`,`nomad-local-config-client-3.hcl`の各ファイルの`client`の項目を下記のように上書きして下さい。他はそのままです。`<DIR>`はカレントディレクトリの絶対パスに置き換えて下さい。
+`nomad-local-config-client-1.hcl`,`nomad-local-config-client-2.hcl`,`nomad-local-config-client-3.hcl`の各ファイルの`client`の項目を下記のよう追記して下さい。他はそのままです。`<DIR>`はカレントディレクトリの絶対パスに置き換えて下さい。
 
 ```hcl
 client {
   enabled = true
   servers = ["127.0.0.1:4647"]
   host_volume "mysql-vol" {
-    path = <DIR>/mysql-data
+    path = "<DIR>/mysql-data"
     read_only = false
   }
 }
@@ -196,6 +226,7 @@ job "mysql-5.7" {
     }
   }
 }
+EOF
 ```
 
 ここでは`host_volume`で作ったVolumeをTask Groupにマッピングし、実際のTaskにマウントしています。
@@ -240,7 +271,7 @@ mysql> show databases;
 `handson`のデータが残っていることがわかるはずです。また、ホストのディレクトリを見てみましょう。
 
 ```console
-$ mkdir mysql-data
+$ ls mysql-data
 auto.cnf           client-key.pem     ib_logfile1        performance_schema server-key.pem
 ca-key.pem         handson            ibdata1            private_key.pem    sys
 ca.pem             ib_buffer_pool     ibtmp1             public_key.pem

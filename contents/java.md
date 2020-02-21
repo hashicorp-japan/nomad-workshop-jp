@@ -10,7 +10,11 @@ NomadではDockerのようなコンテナのワークロードにとどまらず
 
 Java Task Driverはその名の通り、Javaアプリケーションを実行させるためのDriverです。これを利用することでDocker Imageのpullや実行させるために必要なVolumeやネットワークの設定を宣言的に行うことが可能です。
 
-まず一つ簡単なJavaアプリをNomad上で稼働させてみましょう。**ローカルにJavaがインストールされていることを確認してください。**
+まず一つ簡単なJavaアプリをNomad上で稼働させてみましょう。
+
+**ローカルにJavaがインストールされていることを確認してください。**
+
+**Linux OSの方はローカルマシンのファイルをプロセスから取得することが不可能なためこの手順はスキップして「外部のArtifact Sourceから取得する」に進んでください。**
 
 以下のようにJobの定義ファイルを作成します。
 
@@ -32,14 +36,15 @@ job "hello-web-java" {
       driver = "java"
       config {
         jar_path    = "${DIR}/simplest-web/target/demo-0.0.1-SNAPSHOT.jar"
-        jvm_options = ["-Xmx2048m", "-Xms256m"]
       }
       resources {
           cpu    = 500
           memory = 300
           network {
-              port "http" {}
+          port "http" {
+            static = 7070
           }
+        }
       }
     }
   }
@@ -207,35 +212,25 @@ ID        Node ID   Task Group  Version  Desired  Status    Created     Modified
 50fbdd29  4b635091  java-web    5        run      running   12m47s ago  11m41s ago
 ```
 
-こちらの出力結果から、`running`と成功しているAllocationから`Node ID`を取得します。上の例だと`4b635091`に相当します。またAllocation IDもメモしてください。上の例だと`50fbdd29`に相当します。
+こちらの出力結果から、`running`と成功しているAllocationから`Allocation ID`を取得します。上の例だと`50fbdd29`に相当します。
 
 これがJavaがホストされているノードです。このノードがどのディレクトリなのかを識別するために次のコマンドを実行してください。
 
 ```console
-$ export NODE_ID=4b635091
 $ export ALLOC=50fbdd29
-$ nomad node status -verbose -json ${NODE_ID} | jq -r '.HTTPAddr'
-127.0.0.1:5641
+$ nomad fs ${ALLOC} alloc/logs
+
+Mode        Size     Modified Time         Name
+prw-------  0 B      2020-02-19T11:13:13Z  .java-web-task.stderr.fifo
+prw-------  0 B      2020-02-19T11:13:17Z  .java-web-task.stdout.fifo
+-rw-r--r--  0 B      2020-02-19T11:13:13Z  java-web-task.stderr.0
+-rw-r--r--  1.8 KiB  2020-02-19T11:13:17Z  java-web-task.stdout.0
 ```
-
-結果によって以下を実行してください。
-* `127.0.0.1:5641` -> `cd ${DIR}/datadir/local-cluster-data-1`
-* `127.0.0.1:5644` -> `cd ${DIR}/datadir/local-cluster-data-2`
-* `127.0.0.1:5647` -> `cd ${DIR}/datadir/local-cluster-data-3`
-
-ログのファイルは各アロケーションの`alloc/logs`以下に保存されています。
-
-```shell
-$ ls alloc/${ALLOC}/alloc/logs
-webservice.stderr.0 webservice.stdout.0
-```
-
-`ALLOCATION`が複数ある場合は、先ほどメモしたAllocation IDが接頭辞になっているディレクトリを選択します。ここの例だと`50fbdd29-************`です。
 
 `stderr.0`と`stdout.0`とあることがわかるでしょう。`stdout.0`の方を見ると、起動ログと以下のようなアプリログが確認できるはずです。
 
 ```shell
-$ nomad fs ${ALLOC}/alloc/logs/stdout.0
+$ nomad fs ${ALLOC} alloc/logs/java-web-task.stdout.0
 ```
 
 ```

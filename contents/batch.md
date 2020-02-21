@@ -66,6 +66,37 @@ job "hello-java-batch" {
 EOF
 ```
 
+<details><summary>Linuxの場合</summary>
+
+```shell
+cat << EOF > hello-java-batch.nomad
+job "hello-java-batch" {
+  datacenters = ["dc1"]
+
+  type = "batch"
+
+  group "java-batch" {
+    count = 1
+    task "to-upper" {
+      driver = "java"
+      artifact {
+        source = "https://jar-tkaburagi.s3-ap-northeast-1.amazonaws.com/batch-processing-0.0.1-SNAPSHOT.jar"
+      }
+      config {
+        jar_path    = "local/batch-processing-0.0.1-SNAPSHOT.jar"
+        jvm_options = ["-Xmx2048m", "-Xms256m"]
+      }
+      resources {
+          cpu    = 500
+          memory = 300
+      }
+    }
+  }
+}
+EOF
+```
+</details>
+
 ここでは`batch`タイプのジョブを`java`のドライバを利用して実行する定義をしています。このジョブを実際に稼働させてみましょう。
 
 ```console
@@ -79,6 +110,7 @@ $ nomad job run hello-java-batch.nomad
 ```
 
 ここで出力される`Allocation ID`を環境変数にセットしログを見てましょう。
+**以下の手順はLinuxだと実行不可能です。[ISSUE](https://github.com/hashicorp/nomad/issues/6931)あり。**
 
 ```console
 $ export ALLOC=a5059c59
@@ -95,13 +127,7 @@ $ nomad fs ${ALLOC} alloc/logs/to-upper.stdout.0
 以下のようなログが出力され、CSVファイルのデータが大文字に変換されていることがわかります。ジョブのステータスを確認しておきましょう。
 
 ```console
-$ nomad job run hello-java-batch.nomad
-==> Monitoring evaluation "5d7daeb5"
-    Evaluation triggered by job "hello-java-batch"
-    Allocation "3d04b6fc" created: node "4b635091", group "java-batch"
-    Evaluation status changed: "pending" -> "complete"
-==> Evaluation "5d7daeb5" finished with status "complete"
-➜  nomad nomad job status hello-java-batch                                                            kabu@/Users/kabu/hashicorp/nomad
+$ nomad nomad job status 
 ID            = hello-java-batch
 Name          = hello-java-batch
 Submit Date   = 2020-02-01T22:34:49+09:00
@@ -129,9 +155,10 @@ ID        Node ID   Task Group  Version  Desired  Status    Created   Modified
 
 まずは`Prameterized Job`を試してみましょう。これはインプットされた値に対して特定の処理をするためのジョブで、ファンクションのように扱うことが可能です。このジョブをデプロイすると`nomad job dispatch`やAPIコールでinvokeすることが出来ます。ジョブをディスパッチするとペイロードやメタデータがインプットとしてジョブにインジェクションされ処理が実行されます。
 
-`Prameterized Job`は`type`が`batch`である必要があります。
+`Prameterized Job`は`type`が`batch`である必要があります。`/usr/bin/openssl`のパスは環境によって違う可能性があります。`which openssl`で調べて置き換えてください。
 
 ```shell
+$ export DIR=$(pwd)
 $ cat << EOF > parameterized-encrypter.nomad
 job "parameterized-encrypter" {
   datacenters = ["dc1"]
@@ -151,8 +178,8 @@ job "parameterized-encrypter" {
       }
       config {
         # When running a binary that exists on the host, the path must be absolute.
-        command = "openssl"
-        args    = ["aes-256-cbc", "-e", "-in", "${NOMAD_TASK_DIR}/rawtext.txt", "-out", "${DIR}/encrypted.txt", "-pass", "file:local/pass.txt"]
+        command = "/usr/bin/openssl"
+        args    = ["aes-256-cbc", "-e", "-in", "\${NOMAD_TASK_DIR}/rawtext.txt", "-out", "${DIR}/encrypted.txt", "-pass", "file:local/pass.txt"]
       }
       dispatch_payload {
         file = "rawtext.txt"
@@ -260,6 +287,7 @@ parameterized-encrypter/dispatch-1580613031-6b384981  dead
 ```
 
 タスクのディレクトリ内を見てみましょう。
+**以下の手順はLinuxだと実行不可能です。[ISSUE](https://github.com/hashicorp/nomad/issues/6931)あり。**
 
 ```console
 $ nomad fs ${ALLOC} encrypter/local/rawtext.txt
@@ -312,10 +340,6 @@ job "periodic-echo" {
 
   group "periodic-echo" {
     count = 1
-    constraint {
-      attribute = "${attr.os.name}"
-      value     = "darwin"
-    }
     task "periodic-echo" {
       driver = "raw_exec"
       artifact {

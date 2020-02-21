@@ -20,8 +20,8 @@ job "update-demo-webapp" {
     task "server" {
 
       env {
-        PORT    = "${NOMAD_PORT_http}"
-        NODE_IP = "${NOMAD_IP_http}"
+        PORT    = "\${NOMAD_PORT_http}"
+        NODE_IP = "\${NOMAD_IP_http}"
       }
 
       driver = "docker"
@@ -48,7 +48,7 @@ EOF
 それでは以下のコマンドでデプロイしてみましょう。
 
 ```shell
-$ nomad run demo-webapp.nomad
+$ nomad job run my-first-update.nomad
 ```
 
 Jobが起動したか以下のコマンドで確認してみましょう。
@@ -160,8 +160,8 @@ job "update-demo-webapp" {
     task "server" {
 
       env {
-        PORT    = "${NOMAD_PORT_http}"
-        NODE_IP = "${NOMAD_IP_http}"
+        PORT    = "\${NOMAD_PORT_http}"
+        NODE_IP = "\${NOMAD_IP_http}"
       }
 
       driver = "docker"
@@ -244,8 +244,8 @@ job "update-demo-webapp" {
     task "server" {
 
       env {
-        PORT    = "${NOMAD_PORT_http}"
-        NODE_IP = "${NOMAD_IP_http}"
+        PORT    = "\${NOMAD_PORT_http}"
+        NODE_IP = "\${NOMAD_IP_http}"
       }
 
       driver = "docker"
@@ -281,7 +281,7 @@ EOF
 それではこれをデプロイしてみます。今回はアップデートにおける正しい手順である`nomad job plan`コマンドを実行して変更点を確認してから適用したいと思います。
 
 ```console
-$ nomad nomad job plan my-first-update-v3.nomad
+$ nomad job plan my-first-update-v3.nomad
 +/- Job: "update-demo-webapp"
 +/- Task Group: "update-demo-webapp" (1 create/destroy update, 9 ignore)
   +/- Update {
@@ -352,8 +352,8 @@ job "update-demo-webapp" {
     task "server" {
 
       env {
-        PORT    = "${NOMAD_PORT_http}"
-        NODE_IP = "${NOMAD_IP_http}"
+        PORT    = "\${NOMAD_PORT_http}"
+        NODE_IP = "\${NOMAD_IP_http}"
       }
 
       driver = "docker"
@@ -373,6 +373,7 @@ job "update-demo-webapp" {
     }
   }
 }
+EOF
 ```
 
 ここでは`image = "dummy/dummy:v99.9"`とし、ダミーのコンテナーを指定いるため、起動時にエラーとなります。このジョブを稼働させてみましょう。
@@ -434,7 +435,7 @@ job "update-demo-webapp" {
   datacenters = ["dc1"]
 
   update {
-    max_parallel = 1
+    max_parallel = 2
     health_check  = "task_states"
     min_healthy_time = "5s"
     healthy_deadline = "1m"
@@ -447,8 +448,8 @@ job "update-demo-webapp" {
     task "server" {
 
       env {
-        PORT    = "${NOMAD_PORT_http}"
-        NODE_IP = "${NOMAD_IP_http}"
+        PORT    = "\${NOMAD_PORT_http}"
+        NODE_IP = "\${NOMAD_IP_http}"
       }
 
       driver = "docker"
@@ -468,6 +469,7 @@ job "update-demo-webapp" {
     }
   }
 }
+EOF
 ```
 
 今度は正常に稼働するコンテナのため、`canary`の稼働が完了し、残りのインスタンスをローリングでアップデートしていきます。まず更新をプランしてみましょう。

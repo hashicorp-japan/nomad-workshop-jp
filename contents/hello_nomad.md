@@ -2,6 +2,13 @@
 
 ここではNomadを簡単に触ってみましょう。
 
+まず作業用のディレクトリを作成しておきます。
+
+```shell
+$ mkdir nomad-workshop
+$ cd nomad-workshop
+```
+
 [こちら](https://www.nomadproject.io/downloads.html)より、お使いのOSに合ったものをダウンロードしてください。
 
 Nomadは他のHashiCorp製品と同様にシングルバイナリですので、ダウンロードしたバイナリにPathを通すだけで使用可能です。
@@ -28,6 +35,9 @@ Nomad v0.11.1 (1cbb2b9a81b5715be2f201a4650293c9ae517b87)
 ```shell
 $ nomad agent -dev
 ```
+
+> sudoでDockerを起動している場合は`sudo nomad agent -dev`
+
 Nomadは通常実際のワークロードを稼働させるClientとスケジュールングなど管理系の機能を提供するServerを別オプションで起動させます。
 
 DevモードではNomadの機能を確認したりテストするのを容易にするため、サーバーととクライアント両方の特性を持って起動されます。また、Devモードではリスナーやストレージの設定などがプリコンフィグレーションされています。
@@ -299,7 +309,6 @@ $ nomad job stop example
 サーバ用に次のファイルを作ってください。
 
 ```shell
-$ mkdir nomad-workshop
 $ cd nomad-workshop
 $ MY_PATH=$(pwd)
 
@@ -415,6 +424,25 @@ nomad agent -config=${MY_PATH}/nomad-local-config-client-3.hcl &
 EOF
 ```
 
+<details><summary>sudoでDockerを起動している場合</summary>
+  
+```shell
+$ cat << EOF > run.sh
+#!/bin/sh
+sudo pkill nomad
+sudo pkill java
+
+sleep 10
+
+sudo nomad agent -config=${MY_PATH}/nomad-local-config-server.hcl &
+
+sudo nomad agent -config=${MY_PATH}/nomad-local-config-client-1.hcl &
+sudo nomad agent -config=${MY_PATH}/nomad-local-config-client-2.hcl &
+sudo nomad agent -config=${MY_PATH}/nomad-local-config-client-3.hcl &
+EOF
+```
+</details>
+
 Nomadを起動させてみましょう。
 
 ```shell
@@ -423,6 +451,9 @@ $ ./run.sh
 ```
 
 `http://localhost:4646/ui/`にブラウザでアクセスし、一つのサーバと三つのクライアントが起動していることを確認してください。
+
+> サーバ上で実行しローカルからブラウザにアクセスできない方はポートフォワーディングの設定をしてみて下さい。 
+> macOSの場合はローカルマシンでssh -L 8500:127.0.0.1:8500 <username>@<SERVERS_PUBLIC_IP> -Nです。
 
 試しに先ほどと同じジョブを起動させて見ます。
 

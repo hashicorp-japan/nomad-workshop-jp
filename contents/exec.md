@@ -34,6 +34,7 @@ $ ./run.sh
 次にジョブのファイルを作っていきます。
 
 ```shell
+$ cd nomad-workshop
 $ cat << EOF > exec.nomad
 job "hello-exec-batch" {
   datacenters = ["dc1"]
@@ -45,8 +46,8 @@ job "hello-exec-batch" {
       driver = "raw_exec"
       config {
         # When running a binary that exists on the host, the path must be absolute.
-        command = "/bin/echo"
-        args    = ["Hi Nomad Exec Driver"]
+        command = "/bin/bash"
+        args    = ["-c", "echo Hi Nomad Exec Driver && sleep 180" ]
       }
     }
   }
@@ -62,16 +63,17 @@ EOF
 $ nomad job run exec.nomad
 ```
 
-さて、実行結果は標準出力に吐かれているため、ログの中を確認して見ましょう。以下のコマンドで`Application ID`を取得して下さい。一番した方に出力されているはずです。
+さて、実行結果は標準出力に吐かれているため、ログの中を確認して見ましょう。上で出力される`Allocation ID`をコピーしてください。
 
 ```shell
 $ nomad job status -verbose hello-exec-batch
+$ export ALLOC=<ALLOCATIO_ID>
 ```
 
 取得した`Application ID`上のログを見ると`echo`で出力したテキストがログとして残っているでしょう。
 
 ```console
-$ cat {DIR}/datadir/local-cluster-data-1/alloc/<ALLOCATION_ID>/alloc/logs/echo.stdout.0
+$ nomad fs ${ALLOC} alloc/logs/echo.stdout.0
 Hi Nomad Exec Driver
 ```
 
@@ -109,7 +111,8 @@ EOF
 次にこのアプリを稼働させるためのNomadの定義ファイルを作っていきます。`/usr/local/bin/go`のパスは環境によって変わりますのでご注意ください。`which go`で確認することができます。
 
 ```shell
-cat <<EOF > hello-exec-go.nomad
+$ export DIR=$(pwd)
+$ cat <<EOF > hello-exec-go.nomad
 job "hello-exec-go-web" {
   datacenters = ["dc1"]
 
@@ -215,9 +218,10 @@ cd /path/to/nomad-workshop
 <details><summary>nomad-local-config-client-1.hcl</summary>
 	
 ```shell
+$ export DIR=$(pwd)
 $ cat << EOF > nomad-local-config-client-1.hcl
 
-data_dir  = "${MY_PATH}/local-cluster-data-1"
+data_dir  = "${DIR}/local-cluster-data-1"
 
 bind_addr = "127.0.0.1"
 
@@ -255,7 +259,7 @@ EOF
 ```shell
 $ cat << EOF > nomad-local-config-client-2.hcl
 
-data_dir  = "${MY_PATH}/local-cluster-data-2"
+data_dir  = "${DIR}/local-cluster-data-2"
 
 bind_addr = "127.0.0.1"
 
@@ -292,7 +296,7 @@ EOF
 ```shell
 $ cat << EOF > nomad-local-config-client-3.hcl
 
-data_dir  = "${MY_PATH}/local-cluster-data-3"
+data_dir  = "${DIR}/local-cluster-data-3"
 
 bind_addr = "127.0.0.1"
 
@@ -327,10 +331,17 @@ EOF
 
 変更点は各クライアントで`raw-exec`を有効化している点と、`meta.Name`の値を加えている点です。`meta.Name`は各ジョブの`spread`スタンザ内でジョブの分散の基準として利用します。
 
+再起動します。
+
+```shell
+$ ./run.sh
+```
+
 次にジョブの定義を書き換えましょう。
 
 ```shell
-$ cat <<EOF > exec-spread.nomad
+$ cat << EOF > exec-spread.nomad
+
 job "hello-exec-batch" {
   datacenters = ["dc1"]
 
@@ -339,7 +350,7 @@ job "hello-exec-batch" {
   group "example" {
     count = 10
     spread {
-      attribute = "${meta.Name}"
+      attribute = "\${meta.Name}"
       target "client-1" {
         percent = 50
       }
@@ -406,7 +417,7 @@ c7a2f6c2  4b635091  example     1        run      complete  2h55m ago   44m44s a
 次に`7:2:1`の割合に変更してみます。
 
 ```shell
-$ cat <<EOF > exec-spread.nomad
+$ cat << EOF > exec-spread.nomad
 job "hello-exec-batch" {
   datacenters = ["dc1"]
 
@@ -415,7 +426,7 @@ job "hello-exec-batch" {
   group "example" {
     count = 10
     spread {
-      attribute = "${meta.Name}"
+      attribute = "\${meta.Name}"
       target "client-1" {
         percent =  70
       }
@@ -555,7 +566,7 @@ job "hello-exec-batch" {
   group "example" {
     count = 10
     constraint {
-      attribute = "${attr.os.name}"
+      attribute = "\${attr.os.name}"
       value     = "${MY_OS}"
     }
     task "echo" {
@@ -603,7 +614,7 @@ job "hello-exec-batch" {
   group "example" {
     count = 10
     constraint {
-      attribute = "${attr.os.name}"
+      attribute = "\${attr.os.name}"
       value     = "${MY_OS}"
     }
     task "echo" {
