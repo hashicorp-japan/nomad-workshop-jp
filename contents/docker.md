@@ -231,7 +231,7 @@ EOF
 
 ここでは`host_volume`で作ったVolumeをTask Groupにマッピングし、実際のTaskにマウントしています。
 
-ゔぉぅこれを使ってMySQLを起動します。
+これを使ってMySQLを起動します。
 
 ```shell
 $ nomad job run mysql.nomad
@@ -254,7 +254,7 @@ mysql> show databases;
 Nomad Jobを再起動します。
 
 ```shell
-$ nomad job stop mysql.nomad
+$ nomad job stop mysql-5.7
 $ nomad job run mysql.nomad
 ```
 

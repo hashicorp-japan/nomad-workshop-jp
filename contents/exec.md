@@ -108,10 +108,11 @@ func main() {
 EOF
 ```
 
-次にこのアプリを稼働させるためのNomadの定義ファイルを作っていきます。`/usr/local/bin/go`のパスは環境によって変わりますのでご注意ください。`which go`で確認することができます。
+次にこのアプリを稼働させるためのNomadの定義ファイルを作っていきます。
 
 ```shell
 $ export DIR=$(pwd)
+$ export PATH_TO_GO=$(which go)
 $ cat <<EOF > hello-exec-go.nomad
 job "hello-exec-go-web" {
   datacenters = ["dc1"]
@@ -123,7 +124,7 @@ job "hello-exec-go-web" {
     task "go-web" {
       driver = "raw_exec"
       config {
-        command = "/usr/local/bin/go"
+        command = "${PATH_TO_GO}"
         args    = ["run", "${DIR}/main.go"]
       }
     }
@@ -158,6 +159,7 @@ EOF
 ```
 
 ```shell
+$ export PATH_TO_PHP=$(which php)
 $ cat <<EOF > hello-exec-php.nomad
 job "hello-exec-php-web" {
   datacenters = ["dc1"]
@@ -169,7 +171,7 @@ job "hello-exec-php-web" {
     task "php-web" {
       driver = "raw_exec"
       config {
-        command = "/usr/bin/php"
+        command = "${PATH_TO_PHP}"
         args    = ["-S", "localhost:8888", "${DIR}/hello.php"]
       }
     }

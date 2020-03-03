@@ -32,7 +32,7 @@ $ ./mvnw clean package -DskipTests
 このアプリは`src/main/resources/sample-data.csv`ファイルに記載されているテキストを大文字に変換するための簡単なバッチ処理を実装したアプリです。
 
 ```console
-$ cat gs-batch-processing/complete/src/main/resources/sample-data.csv
+$ cat src/main/resources/sample-data.csv
 Jill,Doe
 Joe,Doe
 Justin,Doe
@@ -127,7 +127,7 @@ $ nomad fs ${ALLOC} alloc/logs/to-upper.stdout.0
 以下のようなログが出力され、CSVファイルのデータが大文字に変換されていることがわかります。ジョブのステータスを確認しておきましょう。
 
 ```console
-$ nomad nomad job status 
+$ nomad job status hello-java-batch
 ID            = hello-java-batch
 Name          = hello-java-batch
 Submit Date   = 2020-02-01T22:34:49+09:00
@@ -155,10 +155,12 @@ ID        Node ID   Task Group  Version  Desired  Status    Created   Modified
 
 まずは`Prameterized Job`を試してみましょう。これはインプットされた値に対して特定の処理をするためのジョブで、ファンクションのように扱うことが可能です。このジョブをデプロイすると`nomad job dispatch`やAPIコールでinvokeすることが出来ます。ジョブをディスパッチするとペイロードやメタデータがインプットとしてジョブにインジェクションされ処理が実行されます。
 
-`Prameterized Job`は`type`が`batch`である必要があります。`/usr/bin/openssl`のパスは環境によって違う可能性があります。`which openssl`で調べて置き換えてください。
+`Prameterized Job`は`type`が`batch`である必要があります。
 
 ```shell
+$ cd /path/to/nomad-workshop
 $ export DIR=$(pwd)
+$ PATH_TO_OPENSSL=$(which openssl)
 $ cat << EOF > parameterized-encrypter.nomad
 job "parameterized-encrypter" {
   datacenters = ["dc1"]
@@ -178,7 +180,7 @@ job "parameterized-encrypter" {
       }
       config {
         # When running a binary that exists on the host, the path must be absolute.
-        command = "/usr/bin/openssl"
+        command = "${PATH_TO_OPENSSL}"
         args    = ["aes-256-cbc", "-e", "-in", "\${NOMAD_TASK_DIR}/rawtext.txt", "-out", "${DIR}/encrypted.txt", "-pass", "file:local/pass.txt"]
       }
       dispatch_payload {
@@ -394,9 +396,11 @@ ID                                 Status
 periodic-echo/periodic-1580615160  dead
 ```
 
-`Previously Launched Jobs`が最初は空ですがスケジューリングが始まると`running`になり、処理が終了すると`dead`になるはずです。また1分後に次の処理が実行され、`Previously Launched Jobs`に一つ履歴が増えるはずです。2,3回様子を見てください。
+`Previously Launched Jobs`が最初は空ですがスケジューリングが始まると`running`になり、処理が終了すると`dead`になるはずです。また1分後に次の処理が実行され、`Previously Launched Jobs`に一つ履歴が増えるはずです。2回くらい様子を見てください。
 
 このジョブのログを見て`Previously Launched Jobs`のリストの中の任意のジョブのIDをコピーしてください。
+
+**Linuxの方はRunningのステータスのものを選択して下さい。**
 
 ```console
 $ export JOB=periodic-echo/periodic-1580615160
