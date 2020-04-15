@@ -278,7 +278,7 @@ ca.pem             ib_buffer_pool     ibtmp1             public_key.pem
 client-cert.pem    ib_logfile0        mysql              server-cert.pem
 ```
 
-MySQLのデータがホストに保存されていることがわかるはずです。またVolumeのタイプは現時点では`host_volume`のみの対応となっており、今後その他ストレージもサポートしていく予定になっています。
+MySQLのデータがホストに保存されていることがわかるはずです。今回は`host_volume`を利用しましたがNomadは`CSI Plugin`に対応しており、様々なタイプのストレージを扱うことが可能です。
 
 ここではDocker Driverの基本とPersistence Diskの設定を行いましたが、まだまだ様々な設定を行いことができます。
 
@@ -293,3 +293,5 @@ $ nomad job stop mysql-5.7
 * [Docker Driver](https://www.nomadproject.io/docs/drivers/docker.html)
 * [Volume Configuration](https://www.nomadproject.io/docs/job-specification/volume.html)
 * [Volume Mount Configuration](https://www.nomadproject.io/docs/job-specification/volume_mount.html)
+* [CSI Plugin](https://www.hashicorp.com/blog/hashicorp-nomad-container-storage-interface-csi-beta/)
+* [CSI Plugin Configuration](https://www.nomadproject.io/docs/job-specification/csi_plugin/)
