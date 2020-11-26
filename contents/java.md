@@ -24,6 +24,7 @@ $ export DIR=$(pwd)
 $ git clone https://github.com/tkaburagi/simplest-web
 $ cd simplest-web
 $ ./mvnw clean package -DskipTests
+$ cd ..
 $ cat << EOF > java.nomad
 job "hello-web-java" {
   datacenters = ["dc1"]
@@ -36,14 +37,13 @@ job "hello-web-java" {
       driver = "java"
       config {
         jar_path    = "${DIR}/simplest-web/target/demo-0.0.1-SNAPSHOT.jar"
+        jvm_options = ["-Xmx512m", "-Xms256m"]
       }
       resources {
           cpu    = 500
           memory = 300
           network {
-          port "http" {
-            static = 7070
-          }
+          port "http" {}
         }
       }
     }
@@ -57,7 +57,7 @@ EOF
 それでは起動してみましょう。
 
 ```shell
-$ nomad job run java.nomad
+$ nomad job run -hcl1 java.nomad
 ```
 
 しばらくするとアプリが起動しているはずです。
@@ -118,7 +118,7 @@ $ nomad job stop -purge hello-web-java
 今回はローカルでビルドしたアプリを起動しましたが、CIと組み合わせるような際には外部のArtifactレポジトリから取得したいです。試してみましょう。
 
 ```shell
-$ cd /path/to/nomad-workshop
+$ cd nomad-workshop
 $ cat << EOF > java.nomad
 job "hello-web-java" {
   datacenters = ["dc1"]
@@ -156,7 +156,7 @@ EOF
 それでは起動してみましょう。
 
 ```console
-$ nomad job run java.nomad
+$ nomad job run -hcl1 java.nomad
 
 ==> Monitoring evaluation "49b3e00f"
     Evaluation triggered by job "hello-web-java"
@@ -169,7 +169,7 @@ $ nomad job run java.nomad
 しばらくするとアプリが起動しているでしょう。
 
 ```console
-$ curl 127.0.0.1:7070
+$ curl 127.0.0.1:8080
 Hey you. This Jar is from S3
 ```
 
