@@ -26,6 +26,7 @@ plugin "raw_exec" {
 次にクラスタを再起動させます。
 
 ```shell
+$ cd nomad-workshop
 $ ./run.sh
 ```
 
@@ -60,7 +61,7 @@ EOF
 あとはこれは`nomad`コマンドで実行するだけです。
 
 ```console
-$ nomad job run exec.nomad
+$ nomad job run -hcl1 exec.nomad
 ```
 
 さて、実行結果は標準出力に吐かれているため、ログの中を確認して見ましょう。上で出力される`Allocation ID`をコピーしてください。
@@ -136,7 +137,7 @@ EOF
 シェルスクリプト同様、`command`と`args`を利用してアプリケーションの実行コマンドを記述するだけです。それではこれをNomadで動かしてみます。
 
 ```shell
-$ nomad job run hello-exec-go.nomad
+$ nomad job run -hcl1 hello-exec-go.nomad
 ```
 
 アクセスしてみましょう。
@@ -183,7 +184,7 @@ EOF
 同様に稼働させ、アプリにリクエストしてみます。
 
 ```console
-$ nomad job run hello-exec-php.nomad
+$ nomad job run -hcl1 hello-exec-php.nomad
 $ curl localhost:8888
 Hello World! PHP is running on Nomad
 ```
@@ -225,7 +226,7 @@ $ cat << EOF > nomad-local-config-client-1.hcl
 
 data_dir  = "${DIR}/local-cluster-data-1"
 
-bind_addr = "127.0.0.1"
+bind_addr = "0.0.0.0"
 
 client {
   enabled = true
@@ -263,7 +264,7 @@ $ cat << EOF > nomad-local-config-client-2.hcl
 
 data_dir  = "${DIR}/local-cluster-data-2"
 
-bind_addr = "127.0.0.1"
+bind_addr = "0.0.0.0"
 
 client {
   enabled = true
@@ -289,6 +290,7 @@ plugin "raw_exec" {
   config {
     enabled = true
   }
+}
 EOF
 ```
 </details>
@@ -300,7 +302,7 @@ $ cat << EOF > nomad-local-config-client-3.hcl
 
 data_dir  = "${DIR}/local-cluster-data-3"
 
-bind_addr = "127.0.0.1"
+bind_addr = "0.0.0.0"
 
 client {
   enabled = true
@@ -389,7 +391,7 @@ EOF
 これをデプロイしてみます。
 
 ```shell
-$ nomad job run exec-spread.nomad
+$ nomad job run -hcl1 exec-spread.nomad
 ```
 
 デプロイが完了したらどこのノードで実行されたかを確認してみましょう。
@@ -459,7 +461,7 @@ EOF
 再度起動します。
 
 ```shell
-$ nomad job run exec-spread.nomad
+$ nomad job run -hcl1 exec-spread.nomad
 ```
 
 デプロイが完了したらどこのノードで実行されたかを確認してみましょう。
@@ -590,7 +592,7 @@ EOF
 
 この状態でジョブの軌道を試してみましょう。
 ```console
-$ nomad job run exec-constraint.nomad
+$ nomad job run -hcl1 exec-constraint.nomad
 ==> Monitoring evaluation "e183a9bb"
     Evaluation triggered by job "hello-exec-batch"
     Evaluation status changed: "pending" -> "complete"
@@ -639,7 +641,7 @@ EOF
 起動してみます。
 
 ```console
-$ nomad job run exec-constraint.nomad
+$ nomad job run -hcl1 exec-constraint.nomad
 ==> Monitoring evaluation "b5edcaa7"
     Evaluation triggered by job "hello-exec-batch"
     Allocation "48154342" created: node "6477d9ed", group "example"
