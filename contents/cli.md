@@ -372,7 +372,7 @@ ID        Job ID     Job Version  Status      Description
 `history`はバージョンを出力します。ジョブを変更してバージョンを上げ行った際に現状のバージョンやバージョンアップされた日時などを確認する際に利用します。ここでは実施しませんが`job revert`コマンドでジョブのロールバックなどを行います。
 
 ```console
-$ nomad job history mysql-5.7
+$ nomad job history example
 Version     = 0
 Stable      = true
 Submit Date = 2020-01-31T15:53:24+09:00
@@ -381,7 +381,7 @@ Submit Date = 2020-01-31T15:53:24+09:00
 `eval`コマンドはEvaluationのステータスを確認するためのコマンドです。`初めてのNomad`の章でメモしたEvaluation IDをコピーして下さい。
 
 ```console
-$ nomad job eval status <EVAL_ID>
+$ nomad eval status <EVAL_ID>
 
 ID                 = 720ff6d0
 Create Time        = 35m23s ago
@@ -642,7 +642,7 @@ $ nomad inspect example
 
 ## monitor
 
-`monitor`コマンドはNomadエージェントのログを取得するためのコマンドで、デバッグログなどを確認したいときにとても便利です。
+`monitor`コマンドはNomadエージェントのログを取得するためのコマンドで、デバッグログなどを確認したいときにとても便利です。特に異常やイベントや操作がない限りは何も表示されないのが正しいです。
 
 ```console
 $ nomad monitor -log-level=DEBUG
@@ -653,6 +653,8 @@ $ nomad monitor -log-level=DEBUG
 ```
 
 `-node-id`や`-server-id`でログを絞ったり、`-json`でJSON形式でログを出力することも可能です。
+
+`Ctrl+C`で抜けてください。これ以降の章様々な操作を行うので残しておいて別の端末で操作するのでもOKです。
 
 ## その他のコマンド
 
