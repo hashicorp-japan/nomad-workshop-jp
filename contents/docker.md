@@ -64,7 +64,7 @@ EOF
 それではMySQLを動かしてみましょう。
 
 ```shell
-$ nomad job run mysql.nomad
+$ nomad job run -hcl1 mysql.nomad
 ```
 
 しばらくするとDockerプロセスが立ち上がります。
@@ -127,7 +127,7 @@ mysql> show databases;
 
 ```shell
 $ nomad job stop mysql-5.7
-$ nomad job run mysql.nomad
+$ nomad job run -hcl1 mysql.nomad
 ```
 
 再度ログインして、データを参照してみます。
@@ -178,6 +178,8 @@ $ ./run.sh
 次にMySQLのジョブのファイルを下記のように書き換えます。
 
 ```shell
+$ cd nomad-workshop
+$ sudo mkdir /var/lib/mysql
 $ cat << EOF > mysql.nomad
 job "mysql-5.7" {
   datacenters = ["dc1"]
@@ -234,7 +236,7 @@ EOF
 これを使ってMySQLを起動します。
 
 ```shell
-$ nomad job run mysql.nomad
+$ nomad job run -hcl1 mysql.nomad
 ``` 
 
 あとは同じようにデータを投入して再起動します。
@@ -255,7 +257,7 @@ Nomad Jobを再起動します。
 
 ```shell
 $ nomad job stop mysql-5.7
-$ nomad job run mysql.nomad
+$ nomad job run -hcl1 mysql.nomad
 ```
 
 再度ログインして、データを参照してみます。
