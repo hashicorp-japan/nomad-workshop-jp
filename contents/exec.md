@@ -253,6 +253,12 @@ plugin "raw_exec" {
     enabled = true
   }
 }
+
+telemetry {
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
+  prometheus_metrics         = true
+}
 EOF
 ```
 </details>
@@ -291,6 +297,12 @@ plugin "raw_exec" {
     enabled = true
   }
 }
+
+telemetry {
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
+  prometheus_metrics         = true
+}
 EOF
 ```
 </details>
@@ -328,6 +340,12 @@ plugin "raw_exec" {
   config {
     enabled = true
   }
+}
+
+telemetry {
+  publish_allocation_metrics = true
+  publish_node_metrics       = true
+  prometheus_metrics         = true
 }
 EOF
 ```
