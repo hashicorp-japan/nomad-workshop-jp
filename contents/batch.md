@@ -32,7 +32,8 @@ $ ./mvnw clean package -DskipTests
 このアプリは`src/main/resources/sample-data.csv`ファイルに記載されているテキストを大文字に変換するための簡単なバッチ処理を実装したアプリです。
 
 ```console
-$ cat src/main/resources/sample-data.csv
+$ cd /path/to/nomad-workshop
+$ cat gs-batch-processing/complete/src/main/resources/sample-data.csv
 Jill,Doe
 Joe,Doe
 Justin,Doe
@@ -289,7 +290,6 @@ parameterized-encrypter/dispatch-1580613031-6b384981  dead
 ```
 
 タスクのディレクトリ内を見てみましょう。
-**以下の手順はLinuxだと実行不可能です。[ISSUE](https://github.com/hashicorp/nomad/issues/6931)あり。**
 
 ```console
 $ nomad fs ${ALLOC} encrypter/local/rawtext.txt
