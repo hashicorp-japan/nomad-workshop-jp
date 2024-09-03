@@ -10,7 +10,7 @@ Vaultとの連携はNomadの設定ベースで行うことができます。Vaul
 
 [こちら](https://www.vaultproject.io/downloads/)のWebサイトからご自身のOSに合ったものをダウンロードしてください。
 
-パスを通します。以下はmacOSの例ですが、OSにあった手順で vaultコマンドにパスを通します。
+/usr/local/bin/vaultでvaultコマンドにパスを通します。
 
 ```shell
 $ mv /path/to/vault /usr/local/bin
@@ -26,7 +26,7 @@ Vault v1.5.1
 これでインストールは完了です。別端末でVaultを`dev`モードで立ち上げます。
 
 ```shell
-$ vault agent -dev
+$ vault server -dev
 ```
 
 起動ログに表示される`Root Token`の値をメモしてください。
@@ -116,10 +116,11 @@ $ chmod +x run-vault-local.sh
 
 `NomadサーバがVaultのトークンを動的に発行`と記述しましたが、これはNomadサーバがVault APIを実行し、Vaultのトークンを発行するという挙動になります。そのため、`NomadサーバがVault APIを実行`するための大元のトークンが必要です。
 
-環境変数にその大元のトークンをセットし起動することで以降、そのトークンを利用して実際にアプリが利用するトークンを生成していきます。`<ROOT_TOKEN>`を先ほどメモした`Root Token`に置き換えてください。(通常はRoot Tokenは利用しません)
+環境変数にその大元のトークンをセットし起動することで以降、そのトークンを利用して実際にアプリが利用するトークンを生成していきます。`<ROOT_TOKEN>`を先ほどメモした`Root Token`に置き換えてください。(通常はRoot Tokenは利用しません)加えてVaultのURLも環境変数にセットします。
 
 ```shell
 $ export VAULT_TOKEN=<ROOT_TOKEN>
+$ export VAULT_ADDR='http://127.0.0.1:8200'
 
 $ ./run-vault-local.sh
 ```
@@ -142,12 +143,12 @@ $ vault write aws/config/root \
 
 ```shell
 $ cat << EOF > aws.hcl
-path "aws/*" {
+path "aws/*" {/usr
   capabilities = [ "read" ]
 }
 EOF
 
-$ vault policy write aws /Users/kabu/hashicorp/vault/configs/policies/aws.hcl
+$ vault policy write aws aws.hcl
 ```
 
 作ったポリシーを確認します。
