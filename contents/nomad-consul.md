@@ -126,9 +126,13 @@ job "hello-consul" {
 
   group "web-server" {
     count = 1
-    task "nginx" {
+    network {
+      port "nginx" {
+        static = "80"
+      }
+    }
 
-      service {
+    service {
         name = "nginx"
         tags = ["nginx", "nomad"]
         meta {
@@ -136,30 +140,24 @@ job "hello-consul" {
         }
         check {
           type     = "http"
-          protocol = "http"
-          port     = "nginx"
+          port = "nginx"
           interval = "10s"
           timeout  = "2s"
           path = "/index.html"
         }
-      }
+    }
 
+    task "nginx" {
       driver = "docker"
 
       config {
         image = "nginx"
+        ports = ["nginx"]
       }
 
       resources {
         cpu    = 500
         memory = 256
-
-        network {
-          mbits = 10
-          port "nginx" {
-            static = "80"
-          }
-        }
       }
     }
   }
@@ -176,10 +174,10 @@ EOF
 このジョブを起動してみましょう。
 
 ```shell
-nomad job run hello-consul.nomad
+$ nomad job run hello-consul.nomad
 ```
 
-コンテナが一つ起動しているはずです。
+nginxコンテナが起動しているはずです。
 
 ```console
 docker ps
@@ -191,12 +189,12 @@ Consul側のサービスカタログを確認すると`nginx`というサービ�
 
 `http://localhost:8500/ui/dc1/services`
 
-Nomad AgentとConsul Agentが連携をし、Consul側には設定を行うことなくサービスカタログが更新されます。ConsulのDNSインタフェースを利用してこのサービスをLook-upしてみます。ConsulのDNS用のポートはデフォルトで`8600`です。
+Nomad AgentとConsul Agentが連携し、Consul側には設定を行うことなくサービスカタログが更新されます。ConsulのDNSインタフェースを利用してこのサービスをLook-upしてみます。ConsulのDNS用のポートはデフォルトで`8600`です。
 
 ```console
-dig @127.0.0.1 -p 8600 nginx.service.consul. SRV
+$ dig @127.0.0.1 -p 8600 nginx.service.consul. SRV
 
-; <<>> DiG 9.10.6 <<>> @127.0.0.1 -p 8600 hello-consul-web-server-nginx.service.consul. SRV
+; <<>> DiG 9.10.6 <<>> @127.0.0.1 -p 8600 nginx.service.consul. SRV
 ; (1 server found)
 ;; global options: +cmd
 ;; Got answer:
@@ -207,10 +205,10 @@ dig @127.0.0.1 -p 8600 nginx.service.consul. SRV
 ;; OPT PSEUDOSECTION:
 ; EDNS: version: 0, flags:; udp: 4096
 ;; QUESTION SECTION:
-;hello-consul-web-server-nginx.service.consul. IN SRV
+;nginx.service.consul. IN SRV
 
 ;; ANSWER SECTION:
-hello-consul-web-server-nginx.service.consul. 0	IN SRV 1 1 0 c0a80326.addr.dc1.consul.
+nginx.service.consul. 0	IN SRV 1 1 0 c0a80326.addr.dc1.consul.
 
 ;; ADDITIONAL SECTION:
 c0a80326.addr.dc1.consul. 0	IN	A	192.168.3.38
@@ -227,7 +225,7 @@ Consulのサービスカタログから実際のIPアドレスが返されます
 次にヘルスチェックを確認してみます。Consulのエンドポイントにアクセスして死活状況を見てみます。
 
 ```console
-$ curl http://127.0.0.1:8500/v1/health/checks/hello-consul-web-server-nginx | jq '.[].Status, .[].Output'
+$ curl http://127.0.0.1:8500/v1/health/checks/nginx | jq '.[].Status, .[].Output'
 
 "passing"
 "HTTP GET http://192.168.3.38:80/index.html: 200 OK Output: <!DOCTYPE html>\n<html>\n<head>\n<title>Welcome to nginx!</title>\n<style>\n    body {\n        width: 35em;\n        margin: 0 auto;\n        font-family: Tahoma, Verdana, Arial, sans-serif;\n    }\n</style>\n</head>\n<body>\n<h1>Welcome to nginx!</h1>\n<p>If you see this page, the nginx web server is successfully installed and\nworking. Further configuration is required.</p>\n\n<p>For online documentation and support please refer to\n<a href=\"http://nginx.org/\">nginx.org</a>.<br/>\nCommercial support is available at\n<a href=\"http://nginx.com/\">nginx.com</a>.</p>\n\n<p><em>Thank you for using nginx.</em></p>\n</body>\n</html>\n"
@@ -238,19 +236,20 @@ $ curl http://127.0.0.1:8500/v1/health/checks/hello-consul-web-server-nginx | jq
 エラーを返すようにnginxの設定を編集していきます。`<CONTAINER_ID>`は先ほどメモした内容に置き換えて下さい。
 
 ```shell
-$ docker exec -it <CONTAINER_ID> bin/bash
+$ docker exec -it <nginxのCONTAINER_ID> bin/bash
 ```
 
-`index.html`を削除してエラーを返すように編集していきます。
+コンテナ内で`index.html`を削除してエラーを返すように編集していきます。
 
 ```shell
-$ rm /usr/share/nginx/html/index.html
+root@26f5b587fbee:/ rm /usr/share/nginx/html/index.html
+root@26f5b587fbee:/ exit
 ```
 
 これで`index.html`へのアクセスはエラーになるはずです。もう一度Consulのエンドポイントにアクセスして死活状況を見てみます。
 
 ```console
-$ http://127.0.0.1:8500/v1/health/checks/hello-consul-web-server-nginx | jq '.[].Status, .[].Output'
+$ curl http://127.0.0.1:8500/v1/health/checks/nginx | jq '.[].Status, .[].Output'
 
 "critical"
 "HTTP GET http://192.168.3.38:80/index.html: 404 Not Found Output: <html>\r\n<head><title>404 Not Found</title></head>\r\n<body>\r\n<center><h1>404 Not Found</h1></center>\r\n<hr><center>nginx/1.17.8</center>\r\n</body>\r\n</html>\r\n"
@@ -259,7 +258,7 @@ $ http://127.0.0.1:8500/v1/health/checks/hello-consul-web-server-nginx | jq '.[]
 エラーが返り、Consulは`critical`として正異常なサービスとしてみなされています。この状態で再度ConsulのDNSにサービス名で問い合わせをしてみましょう。
 
 ```console
-$ dig @127.0.0.1 -p 8600 hello-consul-web-server-nginx.service.consul. SRV
+$ dig @127.0.0.1 -p 8600 nginx.service.consul. SRV
 
 ; <<>> DiG 9.10.6 <<>> @127.0.0.1 -p 8600 hello-consul-web-server-nginx.service.consul. SRV
 ; (1 server found)
@@ -272,7 +271,7 @@ $ dig @127.0.0.1 -p 8600 hello-consul-web-server-nginx.service.consul. SRV
 ;; OPT PSEUDOSECTION:
 ; EDNS: version: 0, flags:; udp: 4096
 ;; QUESTION SECTION:
-;hello-consul-web-server-nginx.service.consul. IN SRV
+;nginx.service.consul. IN SRV
 
 ;; AUTHORITY SECTION:
 consul.     0 IN  SOA ns.consul. hostmaster.consul. 1581042348 3600 600 86400 0
