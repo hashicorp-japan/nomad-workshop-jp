@@ -21,7 +21,7 @@
 
 まずは簡単なSpring Boot Batchアプリのジョブを実行してみましょう。まずはアプリケーションの準備をします。
 
-2024/9/2 Java 11で動作確認済み
+2024.9.2 Java11で動作確認済み
 
 ```shell
 $ cd /path/to/nomad-workshop
