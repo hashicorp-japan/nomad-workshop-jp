@@ -18,7 +18,9 @@ $ unzip nomad*.zip
 $ chmod + x nomad
 $ mv nomad /usr/local/bin
 $ nomad -version
-Nomad v0.10.0 (25ee121d951939504376c70bf8d7950c1ddb6a82)
+Nomad v1.9.5
+BuildDate 2025-01-14T18:35:12Z
+Revision 0b7bb8b60758981dae2a78a0946742e09f8316f5+CHANGES
 ```
 
 Nomadのバージョンが表示されるか確認してみましょう。
@@ -26,7 +28,9 @@ Nomadのバージョンが表示されるか確認してみましょう。
 ```console
 $ nomad -version
 
-Nomad v0.11.1 (1cbb2b9a81b5715be2f201a4650293c9ae517b87)
+Nomad v1.9.5
+BuildDate 2025-01-14T18:35:12Z
+Revision 0b7bb8b60758981dae2a78a0946742e09f8316f5+CHANGES
 ```
 次にDevモードでサーバーを起動してみます。
 
@@ -47,16 +51,16 @@ DevモードではNomadの機能を確認したりテストするのを容易に
 ```console
 $ nomad server members
 
-Name                        Address    Port  Status  Leader  Protocol  Build  Datacenter  Region
-masa-mackbook.local.global  127.0.0.1  4648  alive   true    2         0.9.5  dc1         global
+Name                                Address    Port  Status  Leader  Raft Version  Build  Datacenter  Region
+hiro.wakabayashi-JL42TVM46C.global  127.0.0.1  4648  alive   true    3             1.9.5  dc1         global
 ```
 
 クライアントのステータスをみるには以下のコマンドを実行します。
 
 ```console
 $ nomad node status
-ID        DC   Name                 Class   Drain  Eligibility  Status
-33a379fc  dc1  masa-mackbook.local  <none>  false  eligible     ready
+ID        Node Pool  DC   Name                         Class   Drain  Eligibility  Status
+d7bbd92f  default    dc1  hiro.wakabayashi-JL42TVM46C  <none>  false  eligible     ready
 ```
 
 簡単なJobを実行してみましょう。
