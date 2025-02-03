@@ -1,6 +1,6 @@
-# 初めてのNomad
+# 初めての Nomad
 
-ここではNomadを簡単に触ってみましょう。
+ここでは Nomad を簡単に触ってみましょう。
 
 まず作業用のディレクトリを作成しておきます。
 
@@ -9,9 +9,9 @@ $ mkdir nomad-workshop
 $ cd nomad-workshop
 ```
 
-[こちら](https://www.nomadproject.io/downloads.html)より、お使いのOSに合ったものをダウンロードしてください。
+[こちら](https://www.nomadproject.io/downloads.html)より、お使いの OS に合ったものをダウンロードしてください。
 
-Nomadは他のHashiCorp製品と同様にシングルバイナリですので、ダウンロードしたバイナリにPathを通すだけで使用可能です。
+Nomad は他の HashiCorp 製品と同様にシングルバイナリですので、ダウンロードしたバイナリにPathを通すだけで使用可能です。
 
 ```console
 $ unzip nomad*.zip
@@ -23,7 +23,7 @@ BuildDate 2025-01-14T18:35:12Z
 Revision 0b7bb8b60758981dae2a78a0946742e09f8316f5+CHANGES
 ```
 
-Nomadのバージョンが表示されるか確認してみましょう。
+Nomad のバージョンが表示されるか確認してみましょう。
 
 ```console
 $ nomad -version
@@ -32,19 +32,19 @@ Nomad v1.9.5
 BuildDate 2025-01-14T18:35:12Z
 Revision 0b7bb8b60758981dae2a78a0946742e09f8316f5+CHANGES
 ```
-次にDevモードでサーバーを起動してみます。
+次に Dev モードでサーバーを起動してみます。
 
-**もしMacOSをお使いでJDKやJava関連のメッセージが出ましたら、[こちら](https://support.apple.com/kb/DL1572?locale=en_US)にあるJavaパッケージをインストールしてください。**
+**もし MacOS をお使いで JDK や Java 関連のメッセージが出ましたら、[こちら](https://support.apple.com/kb/DL1572?locale=en_US)にある Java パッケージをインストールしてください。**
 
 ```shell
 $ nomad agent -dev
 ```
 
-> sudoでDockerを起動している場合は`sudo nomad agent -dev`
+> sudo で Docker を起動している場合は `sudo nomad agent -dev`
 
-Nomadは通常実際のワークロードを稼働させるClientとスケジュールングなど管理系の機能を提供するServerを別オプションで起動させます。
+Nomad は通常実際のワークロードを稼働させる Client とスケジュールングなど管理系の機能を提供する Server を別オプションで起動させます。
 
-DevモードではNomadの機能を確認したりテストするのを容易にするため、サーバーととクライアント両方の特性を持って起動されます。また、Devモードではリスナーやストレージの設定などがプリコンフィグレーションされています。
+Dev モードでは Nomad の機能を確認したりテストするのを容易にするため、サーバーととクライアント両方の特性を持って起動されます。また、Dev モードではリスナーやストレージの設定などがプリコンフィグレーションされています。
 
 サーバーのステータスやリストを見るには以下のコマンドを実行します。
 
@@ -63,115 +63,94 @@ ID        Node Pool  DC   Name                         Class   Drain  Eligibilit
 d7bbd92f  default    dc1  hiro.wakabayashi-JL42TVM46C  <none>  false  eligible     ready
 ```
 
-簡単なJobを実行してみましょう。
+簡単な Job を実行してみましょう。
 
-NomadにはサンプルのJobファイルを作成する機能があります。
+Nomad にはサンプルの Job ファイルを作成する機能があります。
 
 ```shell
-$ nomad job init -short     # -shortオプションをつけるとコメント無しのJobファイルが作成されます
+$ nomad job init -short     # -short オプションをつけるとコメント無しの Job ファイルが作成されます
 ```
 
-ディレクトリ内にexample.nomadというファイルが作られます。NomadのJobファイルは.nomadという拡張子になります。Jobファイルの詳細については[こちら](https://www.nomadproject.io/docs/job-specification/index.html)を参照ください。
+ディレクトリ内に example.nomad.hcl というファイルが作られます。Nomad の Job ファイルは .nomad.hcl という拡張子になり、HCL のフォーマットが利用可能です。 \
+Job ファイルの詳細については[こちら](https://www.nomadproject.io/docs/job-specification/index.html)を参照ください。
 
-```console
-$ cat example.nomad
+```shell
+$ cat example.nomad.hcl
 
 job "example" {
-  datacenters = ["dc1"]
 
   group "cache" {
+    network {
+      port "db" {
+        to = 6379
+      }
+    }
+
     task "redis" {
       driver = "docker"
 
       config {
-        image = "redis:3.2"
-        port_map {
-          db = 6379
-        }
+        image          = "redis:7"
+        ports          = ["db"]
+        auth_soft_fail = true
+      }
+
+      identity {
+        env  = true
+        file = true
       }
 
       resources {
         cpu    = 500
         memory = 256
-        network {
-          mbits = 10
-          port "db" {}
-        }
-      }
-
-      service {
-        name = "redis-cache"
-        tags = ["global", "cache"]
-        port = "db"
-        check {
-          name     = "alive"
-          type     = "tcp"
-          interval = "10s"
-          timeout  = "2s"
-        }
       }
     }
   }
+}
 ```
 
-Jobファイルには、「何を」「どこに」デプロイするかを*宣言的*に記述します。
-この例では、Dockerを使って`redis:3.2`イメージのコンテナを一つ起動します。また、500MhzのCPUと256MBのメモリ容量と10Mbit/sのネットワーク帯域を満たしているNodeでのみ実行されます。
+Job ファイルには、「何を」「どこに」デプロイするかを*宣言的*に記述します。
+この例では、Docker を使って `redis:7` イメージのコンテナを一つ起動します。また、500Mhz の CPU と 256MB のメモリ容量と 10Mbit/s のネットワーク帯域を満たしている Node でのみ実行されます。
 
 では実際に実行してみましょう。
 
 ```console
-$ nomad job run example.nomad
-
-==> Monitoring evaluation "9b9e5f9b"
-    Evaluation triggered by job "example"
-    Evaluation within deployment: "a3022d8f"
-    Allocation "701f3254" created: node "33a379fc", group "cache"
-    Evaluation status changed: "pending" -> "complete"
-==> Evaluation "9b9e5f9b" finished with status "complete"
+$ nomad job run example.nomad.hcl 
+==> 2025-02-03T11:37:15+09:00: Monitoring evaluation "b4f64e56"
+    2025-02-03T11:37:15+09:00: Evaluation triggered by job "example"
+    2025-02-03T11:37:16+09:00: Evaluation within deployment: "11915738"
+    2025-02-03T11:37:16+09:00: Allocation "7ca34a50" created: node "d7bbd92f", group "cache"
+    2025-02-03T11:37:16+09:00: Evaluation status changed: "pending" -> "complete"
+==> 2025-02-03T11:37:16+09:00: Evaluation "b4f64e56" finished with status "complete"
+==> 2025-02-03T11:37:16+09:00: Monitoring deployment "11915738"
+  ⠦ Deployment "11915738" in progress...
+# ...
 ```
 
 実際にコンテナが起動したか確認してみましょう。
 
 ```console
-$ docker ps
-
-CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                                                  NAMES
-8dd1bfd98166        redis:3.2           "docker-entrypoint.s…"   About a minute ago   Up About a minute   127.0.0.1:28646->6379/tcp, 127.0.0.1:28646->6379/udp   redis-0450729c-179f-b373-0cc9-513514275d91
+$ docker container ls
+CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS                                                  NAMES
+eed3eb50795d   redis:7                     "docker-entrypoint.s…"   25 seconds ago   Up 24 seconds   127.0.0.1:25305->6379/tcp, 127.0.0.1:25305->6379/udp   redis-7ca34a50-34c4-c97d-99be-25b0d2db3f2e
 ```
 
-`redis:3.2`が起動していることが確認できます。
-ログは`nomad logs`コマンドからみれます。引数にAllocation IDを指定します。今回の例では、Jobをrunしたときの出力から`701f3254`であることがわかります。
+`redis:7` が起動していることが確認できます。
+ログは `nomad alloc logs` コマンドからみれます。引数に Allocation ID を指定します。今回の例では、Job を run したときの出力から Allocation ID は `7ca34a50` であることがわかります。
 
-```console
-$ nomad logs 701f3254
-
-1:C 29 Aug 06:53:41.954 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
-                _._
-           _.-``__ ''-._
-      _.-``    `.  `_.  ''-._           Redis 3.2.12 (00000000/0) 64 bit
-  .-`` .-```.  ```\/    _.,_ ''-._
- (    '      ,       .-`  | `,    )     Running in standalone mode
- |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
- |    `-._   `._    /     _.-'    |     PID: 1
-  `-._    `-._  `-./  _.-'    _.-'
- |`-._`-._    `-.__.-'    _.-'_.-'|
- |    `-._`-._        _.-'_.-'    |           http://redis.io
-  `-._    `-._`-.__.-'_.-'    _.-'
- |`-._`-._    `-.__.-'    _.-'_.-'|
- |    `-._`-._        _.-'_.-'    |
-  `-._    `-._`-.__.-'_.-'    _.-'
-      `-._    `-.__.-'    _.-'
-          `-._        _.-'
-              `-.__.-'
-
-1:M 29 Aug 06:53:41.955 # WARNING: The TCP backlog setting of 511 cannot be enforced because /proc/sys/net/core/somaxconn is set to the lower value of 128.
-1:M 29 Aug 06:53:41.955 # Server started, Redis version 3.2.12
-1:M 29 Aug 06:53:41.955 # WARNING you have Transparent Huge Pages (THP) support enabled in your kernel. This will create latency and memory usage issues with Redis. To fix this issue run the command 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' as root, and add it to your /etc/rc.local in order to retain the setting after a reboot. Redis must be restarted after THP is disabled.
-1:M 29 Aug 06:53:41.955 * The server is now ready to accept connections on port 6379
+```shell
+$ nomad alloc logs 7ca34a50  
+1:C 03 Feb 2025 02:37:24.962 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:C 03 Feb 2025 02:37:24.962 * Redis version=7.4.2, bits=64, commit=00000000, modified=0, pid=1, just started
+1:C 03 Feb 2025 02:37:24.962 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+1:M 03 Feb 2025 02:37:24.962 * monotonic clock: POSIX clock_gettime
+1:M 03 Feb 2025 02:37:24.962 * Running mode=standalone, port=6379.
+1:M 03 Feb 2025 02:37:24.962 * Server initialized
+1:M 03 Feb 2025 02:37:24.963 * Ready to accept connections tcp
 ```
 
-それでは、次にJobファイルに変更を加えてみましょう。起動するコンテナの数をデフォルトの１から３に増やしてみます。
-Jobファイルを開き`group`スタンザに[`count`アトリビュート](https://www.nomadproject.io/docs/job-specification/group.html#count)を追加します。
+それでは、次に Job ファイルに変更を加えてみましょう。起動するコンテナの数をデフォルトの 1 から 3 に増やしてみます。
+Job ファイルを開き `group` スタンザに[`count` アトリビュート](https://www.nomadproject.io/docs/job-specification/group.html#count)を追加します。
 
 ```hcl
 group "cache" {
@@ -180,131 +159,149 @@ group "cache" {
   task "redis" {
 ```
 
-NomadにはJobファイルの変更により、何がどう変わるかをPlanしてくれる機能があります。これにより、変更した内容の検証及びその変更が想定したものと問題ないか、事前に確認できます。
+Nomad には Job ファイルの変更により、何がどう変わるかを Plan してくれる機能があります。これにより、変更した内容の検証及びその変更が想定したものと問題ないか、事前に確認できます。
 
 ```console
-$ nomad job plan example.nomad
-
+$ nomad job plan example.nomad.hcl
 +/- Job: "example"
-+/- Stop: "true" => "false"
-+/- Task Group: "cache" (3 create)
++/- Task Group: "cache" (2 create, 1 in-place update)
   +/- Count: "1" => "3" (forces create)
       Task: "redis"
 
 Scheduler dry-run:
 - All tasks successfully allocated.
 
-Job Modify Index: 254
+Job Modify Index: 17
 To submit the job with version verification run:
 
-nomad job run -check-index 254 example.nomad
+nomad job run -check-index 17 example.nomad.hcl
 
 When running the job with the check-index flag, the job will only be run if the
-server side version matches the job modify index returned. If the index has
+job modify index given matches the server-side version. If the index has
 changed, another user has modified the job and the plan's results are
 potentially invalid.
 ```
 
-Plan内容をみてみると、Countが１から３に変更されたことが確認できます。
-新しいJobファイルを実行してみましょう。
+Plan 内容をみてみると、Count が 1 から 3 に変更されたことが確認できます。
+新しい Job ファイルを実行してみましょう。
 
 ```console
-$ nomad job run example.nomad
+$ nomad job run example.nomad.hcl
+==> 2025-02-03T11:44:35+09:00: Monitoring evaluation "1c38209e"
+    2025-02-03T11:44:35+09:00: Evaluation triggered by job "example"
+    2025-02-03T11:44:36+09:00: Evaluation within deployment: "e3fa89f5"
+    2025-02-03T11:44:36+09:00: Allocation "7ca34a50" modified: node "d7bbd92f", group "cache"
+    2025-02-03T11:44:36+09:00: Allocation "68955b0e" created: node "d7bbd92f", group "cache"
+    2025-02-03T11:44:36+09:00: Allocation "d64cb1dc" created: node "d7bbd92f", group "cache"
+    2025-02-03T11:44:36+09:00: Evaluation status changed: "pending" -> "complete"
+==> 2025-02-03T11:44:36+09:00: Evaluation "1c38209e" finished with status "complete"
+==> 2025-02-03T11:44:36+09:00: Monitoring deployment "e3fa89f5"
+  ⠸ Deployment "e3fa89f5" in progress...
+# ...
 
-==> Monitoring evaluation "164d6cf5"
-    Evaluation triggered by job "example"
-    Allocation "8cf4812b" created: node "33a379fc", group "cache"
-    Allocation "b8c71633" created: node "33a379fc", group "cache"
-    Allocation "bb7db1e3" created: node "33a379fc", group "cache"
-    Allocation "bb7db1e3" status changed: "pending" -> "running" (Tasks are running)
-    Evaluation status changed: "pending" -> "complete"
-==> Evaluation "164d6cf5" finished with status "complete"
 ```
 
-しばらくおいて`docker ps`でコンテナの情報を見てみましょう。
+しばらくおいて `docker container ls` でコンテナの情報を見てみましょう。
 
 ```console
-$ docker ps
-
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                  NAMES
-94401e464ba7        redis:3.2           "docker-entrypoint.s…"   56 seconds ago      Up 55 seconds       127.0.0.1:31303->6379/tcp, 127.0.0.1:31303->6379/udp   redis-8cf4812b-c0fe-c817-acfa-3b42920743a2
-834de1552749        redis:3.2           "docker-entrypoint.s…"   56 seconds ago      Up 56 seconds       127.0.0.1:28871->6379/tcp, 127.0.0.1:28871->6379/udp   redis-bb7db1e3-c015-a9fe-1388-dd3016791e8b
-a47d0ae31dd2        redis:3.2           "docker-entrypoint.s…"   56 seconds ago      Up 55 seconds       127.0.0.1:23735->6379/tcp, 127.0.0.1:23735->6379/udp   redis-b8c71633-c333-c6e9-8217-a4c0bdddf180
+$ docker container ls
+CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS                                                  NAMES
+8fdc9b553899   redis:7                     "docker-entrypoint.s…"   30 seconds ago   Up 30 seconds   127.0.0.1:21776->6379/tcp, 127.0.0.1:21776->6379/udp   redis-d64cb1dc-d53c-9256-b913-f320e80ac55b
+2a592d954494   redis:7                     "docker-entrypoint.s…"   30 seconds ago   Up 30 seconds   127.0.0.1:23743->6379/tcp, 127.0.0.1:23743->6379/udp   redis-68955b0e-1e3c-6e98-37e9-eb6066b89447
+eed3eb50795d   redis:7                     "docker-entrypoint.s…"   7 minutes ago    Up 7 minutes    127.0.0.1:25305->6379/tcp, 127.0.0.1:25305->6379/udp   redis-7ca34a50-34c4-c97d-99be-25b0d2db3f2e
 ```
 
-Jobファイルの定義通りコンテナが３つ起動していることが確認できます。
-さて、NomadはJobファイルに書かれている状態を維持するようJobを監視します。そこで、強制的にひとつのコンテナを`kill`してみましょう。ここではContainer IDが`94401e464ba7`のコンテナを終了させます。
+Job ファイルの定義通りコンテナが3つ起動していることが確認できます。
+さて、Nomad は Job ファイルに書かれている状態を維持するよう Job を監視します。そこで、強制的にひとつのコンテナを `kill` してみましょう。ここでは Container ID が `8fdc9b553899` のコンテナを終了させます。
 
 ```console
-$ docker kill 94401e464ba7
+$ docker kill 8fdc9b553899
+8fdc9b553899
 
-94401e464ba7
-
-$ docker ps
-
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                  NAMES
-834de1552749        redis:3.2           "docker-entrypoint.s…"   2 minutes ago       Up 2 minutes        127.0.0.1:28871->6379/tcp, 127.0.0.1:28871->6379/udp   redis-bb7db1e3-c015-a9fe-1388-dd3016791e8b
-a47d0ae31dd2        redis:3.2           "docker-entrypoint.s…"   2 minutes ago       Up 2 minutes        127.0.0.1:23735->6379/tcp, 127.0.0.1:23735->6379/udp   redis-b8c71633-c333-c6e9-8217-a4c0bdddf180
-
+$ docker container ls
+CONTAINER ID   IMAGE                       COMMAND                  CREATED         STATUS         PORTS                                                  NAMES
+2a592d954494   redis:7                     "docker-entrypoint.s…"   2 minutes ago   Up 2 minutes   127.0.0.1:23743->6379/tcp, 127.0.0.1:23743->6379/udp   redis-68955b0e-1e3c-6e98-37e9-eb6066b89447
+eed3eb50795d   redis:7                     "docker-entrypoint.s…"   9 minutes ago   Up 9 minutes   127.0.0.1:25305->6379/tcp, 127.0.0.1:25305->6379/udp   redis-7ca34a50-34c4-c97d-99be-25b0d2db3f2e
 ```
 
 コンテナの数がひとつ減っています。
-Nomadは裏側でその変更を監視しており、本来の「あるべき姿」へ修正してくれます。
-しばらく待ってから、再度Dockerの状態を確認してみましょう。
+Nomad は裏側でその変更を監視しており、本来の「あるべき姿」へ修正してくれます。
+しばらく待ってから、再度 Docker の状態を確認してみましょう。
 
 ```console
-$ docker ps
+$ docker container ls
 
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                  PORTS                                                  NAMES
-d0d3dd071082        redis:3.2           "docker-entrypoint.s…"   1 second ago        Up Less than a second   127.0.0.1:31303->6379/tcp, 127.0.0.1:31303->6379/udp   redis-8cf4812b-c0fe-c817-acfa-3b42920743a2
-834de1552749        redis:3.2           "docker-entrypoint.s…"   2 minutes ago       Up 2 minutes            127.0.0.1:28871->6379/tcp, 127.0.0.1:28871->6379/udp   redis-bb7db1e3-c015-a9fe-1388-dd3016791e8b
-a47d0ae31dd2        redis:3.2           "docker-entrypoint.s…"   2 minutes ago       Up 2 minutes            127.0.0.1:23735->6379/tcp, 127.0.0.1:23735->6379/udp   redis-b8c71633-c333-c6e9-8217-a4c0bdddf180
+CONTAINER ID   IMAGE                       COMMAND                  CREATED          STATUS          PORTS                                                  NAMES
+6319d3df9005   redis:7                     "docker-entrypoint.s…"   37 seconds ago   Up 36 seconds   127.0.0.1:21776->6379/tcp, 127.0.0.1:21776->6379/udp   redis-d64cb1dc-d53c-9256-b913-f320e80ac55b
+2a592d954494   redis:7                     "docker-entrypoint.s…"   3 minutes ago    Up 3 minutes    127.0.0.1:23743->6379/tcp, 127.0.0.1:23743->6379/udp   redis-68955b0e-1e3c-6e98-37e9-eb6066b89447
+eed3eb50795d   redis:7                     "docker-entrypoint.s…"   10 minutes ago   Up 10 minutes   127.0.0.1:25305->6379/tcp, 127.0.0.1:25305->6379/udp   redis-7ca34a50-34c4-c97d-99be-25b0d2db3f2e
 ```
 
-Jobファイルで定義した状態に戻っています。
-このNomadの作業状態をみるには、`nomad job status`コマンドを使います。
+Job ファイルで定義した状態に戻っています。
+この Nomad の作業状態をみるには、`nomad job status` コマンドを使います。
 
 ```console
 $ nomad job status example
-
 ID            = example
 Name          = example
-Submit Date   = 2019-08-30T13:42:31+09:00
+Submit Date   = 2025-02-03T11:44:35+09:00
 Type          = service
 Priority      = 50
-Datacenters   = dc1
+Datacenters   = *
+Namespace     = default
+Node Pool     = default
 Status        = running
 Periodic      = false
 Parameterized = false
 
 Summary
-Task Group  Queued  Starting  Running  Failed  Complete  Lost
-cache       0       1         2        1       5         0
+Task Group  Queued  Starting  Running  Failed  Complete  Lost  Unknown
+cache       0       1         2        0       0         0     0
+
+Latest Deployment
+ID          = e3fa89f5
+Status      = successful
+Description = Deployment completed successfully
+
+Deployed
+Task Group  Desired  Placed  Healthy  Unhealthy  Progress Deadline
+cache       3        3       3        0          2025-02-03T11:54:45+09:00
 
 Allocations
-ID        Node ID   Task Group  Version  Desired  Status    Created     Modified
-b65b0dba  33a379fc  cache       7        run      pending   0s ago      0s ago
-8cf4812b  33a379fc  cache       7        stop     failed    24m5s ago   0s ago
-b8c71633  33a379fc  cache       7        run      running   24m5s ago   23m51s ago
-bb7db1e3  33a379fc  cache       7        run      running   24m5s ago   23m45s ago
-701f3254  33a379fc  cache       5        stop     complete  22h12m ago  4h54m ago
+ID        Node ID   Task Group  Version  Desired  Status   Created     Modified
+68955b0e  d7bbd92f  cache       1        run      running  4m36s ago   4m25s ago
+d64cb1dc  d7bbd92f  cache       1        run      pending  4m36s ago   5s ago
+7ca34a50  d7bbd92f  cache       1        run      running  11m56s ago  4m25s ago
 ```
 
-1つのコンテナが`Failed`になっており、それを復旧すべく`Starting`のAllocationが実行されていることが確認できます。
+1つのコンテナが `pending` になっており、Nomad により Desired の状態になっているかがチェックされてることがわかります。
 
 
-NomadのJobを終了させるには`nomad job stop`コマンドを使います。
+Nomad の Job を終了させるには `nomad job stop` コマンドを使います。
 
 ```console
 $ nomad job stop example
-
-==> Monitoring evaluation "8b5de473"
-    Evaluation triggered by job "example"
-    Evaluation status changed: "pending" -> "complete"
-==> Evaluation "8b5de473" finished with status "complete"
+==> 2025-02-03T11:52:15+09:00: Monitoring evaluation "2e13ac71"
+    2025-02-03T11:52:15+09:00: Evaluation triggered by job "example"
+    2025-02-03T11:52:16+09:00: Evaluation within deployment: "e3fa89f5"
+    2025-02-03T11:52:16+09:00: Evaluation status changed: "pending" -> "complete"
+==> 2025-02-03T11:52:16+09:00: Evaluation "2e13ac71" finished with status "complete"
+==> 2025-02-03T11:52:16+09:00: Monitoring deployment "e3fa89f5"
+  ✓ Deployment "e3fa89f5" successful
+    
+    2025-02-03T11:52:16+09:00
+    ID          = e3fa89f5
+    Job ID      = example
+    Job Version = 1
+    Status      = successful
+    Description = Deployment completed successfully
+    
+    Deployed
+    Task Group  Desired  Placed  Healthy  Unhealthy  Progress Deadline
+    cache       3        3       3        0          2025-02-03T11:54:45+09:00
 ```
 
-終了するとNomadがAllocationしたJobがクリーンアップされます。
+終了すると Nomad が Allocation した Job がクリーンアップされます。
 
 ## Nomadを通常モードで起動する
 
