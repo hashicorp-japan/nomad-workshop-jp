@@ -1,27 +1,27 @@
-# Nomadでバッチジョブを動かす
+# Nomad でバッチジョブを動かす
 
-今まで様々なTask Driverを利用してWebアプリケーションをメインに動かしてきました。Nomadではジョブ設定ファイルの`job`スタンザ内の`type`というパラメータに`Scheduler`を指定することでざまざまなタイプのワークロードを稼働させることが出来ます。
+今まで様々な Task Driver を利用して Web アプリケーションをメインに動かしてきました。Nomad ではジョブ設定ファイルの`job`スタンザ内の`type`というパラメータに`Scheduler`を指定することでざまざまなタイプのワークロードを稼働させることが出来ます。
 
 * Service Scheduler: 
-	* Long runningなタスク。
-	* OperatorがStopするまでRunning状態が維持される。
+	* Long running なタスク。
+	* Operator が Stop するまで Running 状態が維持される。
 * Batch Scheduler: 
-	* Short livedなタスク。
-	* Taskが終了するまで実行される。
+	* Short lived なタスク。
+	* Task が終了するまで実行される。
 * System Scheduler: 
-	* 全てのClient上で実行されるタスク。
-	* OperatorがStopするか、PreemptedされるまでRunning状態を維持される。
-	* 新たなClientがJoinした際にも起動される。
+	* 全ての Client 上で実行されるタスク。
+	* Operator が Stop するか、Preempted されるまで Running 状態を維持される。
+	* 新たな Client が Join した際にも起動される。
 
-今までのWebのアプリケーションは`service`を指定しており、`exec.nomad`では`batch`を指定していました。
+今までの Web のアプリケーションは`service`を指定しており、`exec.nomad`では`batch`を指定していました。
 
 ここでは`Batch Scheduler`を利用して様々なジョブを実行してみたいと思います。
 
-## 基本的なBatch Job
+## 基本的な Batch Job
 
-まずは簡単なSpring Boot Batchアプリのジョブを実行してみましょう。まずはアプリケーションの準備をします。
+まずは簡単な Spring Boot Batch アプリのジョブを実行してみましょう。まずはアプリケーションの準備をします。
 
-2024.9.2 Java11で動作確認済み
+2024.9.2 Java11 で動作確認済み
 
 ```shell
 $ cd /path/to/nomad-workshop
@@ -43,7 +43,7 @@ Jane,Doe
 John,Doe
 ```
 
-次にこのアプリを実行するためのNomadのジョブ定義ファイルを作成します。
+次にこのアプリを実行するための Nomad のジョブ定義ファイルを作成します。
 
 ```shell
 $ cat << EOF > hello-java-batch.nomad
@@ -113,7 +113,7 @@ $ nomad job run hello-java-batch.nomad
 ```
 
 ここで出力される`Allocation ID`を環境変数にセットしログを見てましょう。
-**以下の手順はLinuxだと実行不可能です。[ISSUE](https://github.com/hashicorp/nomad/issues/6931)あり。**
+**以下の手順は Linux だと実行不可能です。[ISSUE](https://github.com/hashicorp/nomad/issues/6931)あり。**
 
 ```console
 $ export ALLOC=a5059c59
@@ -127,7 +127,7 @@ $ nomad fs ${ALLOC} alloc/logs/to-upper.stdout.0
 ~~~~~~
 ```
 
-以下のようなログが出力され、CSVファイルのデータが大文字に変換されていることがわかります。ジョブのステータスを確認しておきましょう。
+以下のようなログが出力され、CSV ファイルのデータが大文字に変換されていることがわかります。ジョブのステータスを確認しておきましょう。
 
 ```console
 $ nomad job status hello-java-batch
@@ -152,11 +152,11 @@ ID        Node ID   Task Group  Version  Desired  Status    Created   Modified
 
 `status`が`dead`となっており停止していることがわかります。この状態のジョブは正常終了とされ、再起動などはされません。以上のように`type`に`batch`を指定することで一回限りのジョブを実行できることがわかります。
 
-以下で`batch`のタイプのジョブの中でもNomadの機能を利用して様々なジョブを実行してみます。
+以下で`batch`のタイプのジョブの中でも Nomad の機能を利用して様々なジョブを実行してみます。
 
 ## Parameterized Job
 
-まずは`Prameterized Job`を試してみましょう。これはインプットされた値に対して特定の処理をするためのジョブで、ファンクションのように扱うことが可能です。このジョブをデプロイすると`nomad job dispatch`やAPIコールでinvokeすることが出来ます。ジョブをディスパッチするとペイロードやメタデータがインプットとしてジョブにインジェクションされ処理が実行されます。
+まずは`Prameterized Job`を試してみましょう。これはインプットされた値に対して特定の処理をするためのジョブで、ファンクションのように扱うことが可能です。このジョブをデプロイすると`nomad job dispatch`や API コールで invoke することが出来ます。ジョブをディスパッチするとペイロードやメタデータがインプットとしてジョブにインジェクションされ処理が実行されます。
 
 `Prameterized Job`は`type`が`batch`である必要があります。
 
@@ -197,7 +197,7 @@ EOF
 
 `type`に`batch`を指定し、ジョブスタンザ内に`prameterized`の設定を入れ`Prameterized Job`を有効化しています。インプットにはペイロードやメタデータを扱うことが出来ますが、まずはペイロードのみ`required`としています。
 
-タスクスタンザ内が実際のタスクの定義で今回は`openssl`コマンドを使って入力された値を暗号化するとても簡単なタスクです。復号化に必要なパスワードのファイルは簡易的にパブリックアクセス可能なS3に保存されており、それを`artifact`で取得しています。
+タスクスタンザ内が実際のタスクの定義で今回は`openssl`コマンドを使って入力された値を暗号化するとても簡単なタスクです。復号化に必要なパスワードのファイルは簡易的にパブリックアクセス可能な S3 に保存されており、それを`artifact`で取得しています。
 
 このジョブを稼働させるときにペイロードとしてテキストを入力すると、それが起動時にタスク内のディレクトリに`rawtext.txt`として保存され、処理内で扱うことが出来ます。
 
@@ -236,7 +236,7 @@ Pending  Running  Dead
 Dispatched Jobs
 ```
 
-ステータスを見ると、`Dispatched Jobs`が空となっています。それではこれをinvokeしてみましょう。このコマンドでは`nomad job dispatch <Parameterzed Job> <Input Source>`を使ってジョブをinvokeし、`Input Source`に`"this is a raw text!!"`を渡しています。
+ステータスを見ると、`Dispatched Jobs`が空となっています。それではこれを invoke してみましょう。このコマンドでは`nomad job dispatch <Parameterzed Job> <Input Source>`を使ってジョブを invoke し、`Input Source`に`"this is a raw text!!"`を渡しています。
 
 これが`raxtext.txt`として扱われファイルの暗号化を実施します。
 
@@ -361,9 +361,9 @@ EOF
 
 `periodic`の設定をジョブスタンザ内に入れています。`periodic`内に設定するのはスケジューリングの設定である`cron`, `time_zone`と同一ジョブをオーバーラップして実行させることを許可するかどうかの`prohibit_overlap`です。
 
-`cron`は[こちら](https://github.com/gorhill/cronexpr#implementation)の記述方法に従い、`time_zone`はGolangが解釈できるフォーマットで記述します。
+`cron`は[こちら](https://github.com/gorhill/cronexpr#implementation)の記述方法に従い、`time_zone`は Golang が解釈できるフォーマットで記述します。
 
-今回は`echo`で文字列を表示させ30秒スリープするだけの簡単なジョブにしています。これをNomadに登録していきます。
+今回は`echo`で文字列を表示させ 30 秒スリープするだけの簡単なジョブにしています。これを Nomad に登録していきます。
 
 ```console
 $ nomad job run periodic-echo.nomad
@@ -371,7 +371,7 @@ Job registration successful
 Approximate next launch time: 2020-02-02T13:04:00+09:00 (22s from now)
 ```
 
-`parameterised`と同様にジョブ登録成功のメッセージと次の実行時間が表示されます。`watch`コマンド使ってJobのステータスを監視しましょう。
+`parameterised`と同様にジョブ登録成功のメッセージと次の実行時間が表示されます。`watch`コマンド使って Job のステータスを監視しましょう。
 
 別のターミナルを立ち上げて以下のコマンドを実行してください。
 
@@ -398,11 +398,11 @@ ID                                 Status
 periodic-echo/periodic-1580615160  dead
 ```
 
-`Previously Launched Jobs`が最初は空ですがスケジューリングが始まると`running`になり、処理が終了すると`dead`になるはずです。また1分後に次の処理が実行され、`Previously Launched Jobs`に一つ履歴が増えるはずです。2回くらい様子を見てください。
+`Previously Launched Jobs`が最初は空ですがスケジューリングが始まると`running`になり、処理が終了すると`dead`になるはずです。また 1 分後に次の処理が実行され、`Previously Launched Jobs`に一つ履歴が増えるはずです。2 回くらい様子を見てください。
 
-このジョブのログを見て`Previously Launched Jobs`のリストの中の任意のジョブのIDをコピーしてください。
+このジョブのログを見て`Previously Launched Jobs`のリストの中の任意のジョブの ID をコピーしてください。
 
-**Linuxの方はRunningのステータスのものを選択して下さい。**
+**Linux の方は Running のステータスのものを選択して下さい。**
 
 ```console
 $ export JOB=periodic-echo/periodic-1580615160
@@ -440,13 +440,13 @@ Hi Nomad Periodic Scheduler
 
 以下のようにジョブが正しく実行出来ていることがわかるはずです。
 
-ここではNomadの`Batch Schduler`を利用して
+ここでは Nomad の`Batch Schduler`を利用して
 
 * ワンタイムのバッチ処理
 * `Parameterized Job`を使ったイベント処理
 * `Periodic Job`を使った定期処理
 
-を実行させてみました。Nomadではこのように`Batch Scheduler`を使って様々なワークロードを稼働させることが可能です。
+を実行させてみました。Nomad ではこのように`Batch Scheduler`を使って様々なワークロードを稼働させることが可能です。
 
 最後にジョブを停止しておきましょう。
 

@@ -1,37 +1,37 @@
-# NomadとConsulの連携機能を試す
+# Nomad と Consul の連携機能を試す
 
-NomadにはHashiCorp Consulと連携をしService Discovery, Load Brancing, Health Checking, Sidecarなどより高度なサービス管理を行うことがきます。
+Nomad には HashiCorp Consul と連携をし Service Discovery, Load Brancing, Health Checking, Sidecar などより高度なサービス管理を行うことがきます。
 
-Consulとの連携はNomadの設定ベースで行うことができます。Consulを初めて触る方は、このハンズオンを実行する前に[Consul Workshop](https://github.com/hashicorp-japan/consul-workshop)を実施することをお勧めします。
+Consul との連携は Nomad の設定ベースで行うことができます。Consul を初めて触る方は、このハンズオンを実行する前に[Consul Workshop](https://github.com/hashicorp-japan/consul-workshop)を実施することをお勧めします。
 
-まずはConsulをインストールして起動してみましょう。
+まずは Consul をインストールして起動してみましょう。
 
-## Consulのインストール
+## Consul のインストール
 
-[こちら](https://www.consul.io/downloads.html)のWebサイトからご自身のOSに合ったものをダウンロードしてください。
+[こちら](https://www.consul.io/downloads.html)の Web サイトからご自身の OS に合ったものをダウンロードしてください。
 
-パスを通します。以下はmacOSの例ですが、OSにあった手順で consulコマンドにパスを通します。
+パスを通します。以下は macOS の例ですが、OS にあった手順で consul コマンドにパスを通します。
 
 ```shell
 $ mv /path/to/consul /usr/local/bin
 $ chmod +x /usr/local/bin/consul
 ```
-新しい端末を立ち上げ、Consulのバージョンを確認します。
+新しい端末を立ち上げ、Consul のバージョンを確認します。
 
 ```console
 $ consul --version
 Consul v1.5.1
 ```
 
-これでインストールは完了です。別端末でConsulを`dev`モードで立ち上げます。
+これでインストールは完了です。別端末で Consul を`dev`モードで立ち上げます。
 
 ```shell
 $ consul agent -dev
 ```
 
-## Nomadサーバの起動
+## Nomad サーバの起動
 
-NomadサーバにConsulとの連携機能を入れて再起動します。まずはNomadエージェントがConsulサーバと通信し、Consulの管理対象に参加させることが必要です。
+Nomad サーバに Consul との連携機能を入れて再起動します。まずは Nomad エージェントが Consul サーバと通信し、Consul の管理対象に参加させることが必要です。
 
 ```shell
 $ cd /path/to/nomad-workshop
@@ -97,25 +97,25 @@ EOF
 $ chmod +x run-nomad-consul.sh
 ```
 
-ここでは`consul`スタンザを利用してNomadエージェントがConsulのサービスとして登録されるための設定を行いました。TLS通信やConsulでACLの設定をしている際には追加で設定が必要ですが今回は`dev`モードで起動しているため`address`のみ指定していればOKです。
+ここでは`consul`スタンザを利用して Nomad エージェントが Consul のサービスとして登録されるための設定を行いました。TLS 通信や Consul で ACL の設定をしている際には追加で設定が必要ですが今回は`dev`モードで起動しているため`address`のみ指定していれば OK です。
 
-それではNomadを起動します。
+それでは Nomad を起動します。
 
 ```shell
 $ ./run-nomad-consul.sh
 ```
 
-Nomadサーバが起動したら`http://127.0.0.1:8500/ui/dc1/services`にブラウザでアクセスしてください。
+Nomad サーバが起動したら`http://127.0.0.1:8500/ui/dc1/services`にブラウザでアクセスしてください。
 
-`nomad`, `nomad-client`の二つがServicesが登録されているでしょう。`Health Checks`が失敗している際は少し待ってからブラウザを更新してみてください。
+`nomad`, `nomad-client`の二つが Services が登録されているでしょう。`Health Checks`が失敗している際は少し待ってからブラウザを更新してみてください。
 
-これでConsul, Nomadのサーバ側の準備は完了です。次以降でConsulの機能を実際のジョブから利用してみます。
+これで Consul, Nomad のサーバ側の準備は完了です。次以降で Consul の機能を実際のジョブから利用してみます。
 
-## Service DiscoverytとHealth Checking
+## Service Discoveryt と Health Checking
 
-Service DiscoveryはConsulの一番基本的な機能です。通常IPアドレスやホスト名など物理的なロケーションでサービス同士を接続させますが、Consulを利用することでConsulがDNSのように振る舞い、サービス名で接続先を指定することが可能です。
+Service Discovery は Consul の一番基本的な機能です。通常 IP アドレスやホスト名など物理的なロケーションでサービス同士を接続させますが、Consul を利用することで Consul が DNS のように振る舞い、サービス名で接続先を指定することが可能です。
 
-Consulを利用するためのNomadのジョブ定義ファイルを作っていきます。
+Consul を利用するための Nomad のジョブ定義ファイルを作っていきます。
 
 ```shell
 $ cat << EOF > hello-consul.nomad
@@ -167,7 +167,7 @@ EOF
 
 ここでは主に二つの設定を行なっています。
 
-* `service`: Serviceに関する基本情報を登録します。`name`で指定したサービス名で`<NAME>.service.consul`のURLでLook-upするとこのサービス名をキーにConsulが実際のロケーションを返します。
+* `service`: Service に関する基本情報を登録します。`name`で指定したサービス名で`<NAME>.service.consul`の URL で Look-up するとこのサービス名をキーに Consul が実際のロケーションを返します。
 * `check`: `service`内に定義する設定で、ヘルスチェックに関する設定です。プロトコルやヘルスチェックをするエンドポイント、間隔などを指定します。
 
 
@@ -177,7 +177,7 @@ EOF
 $ nomad job run hello-consul.nomad
 ```
 
-nginxコンテナが起動しているはずです。
+nginx コンテナが起動しているはずです。
 
 ```console
 docker ps
@@ -185,11 +185,11 @@ CONTAINER ID        IMAGE               COMMAND                  CREATED        
 7fa8d93d93d1        nginx               "nginx -g 'daemon of…"   3 minutes ago       Up 3 minutes        192.168.3.38:80->80/tcp, 192.168.3.38:80->80/udp   nginx-4ceeb4d7-04f0-02f8-5b5b-0473f003e029
 ```
 
-Consul側のサービスカタログを確認すると`nginx`というサービスがConsulに登録されているはずです。ここで表示される`CONTAINER ID`はメモしておいて下さい。
+Consul 側のサービスカタログを確認すると`nginx`というサービスが Consul に登録されているはずです。ここで表示される`CONTAINER ID`はメモしておいて下さい。
 
 `http://localhost:8500/ui/dc1/services`
 
-Nomad AgentとConsul Agentが連携し、Consul側には設定を行うことなくサービスカタログが更新されます。ConsulのDNSインタフェースを利用してこのサービスをLook-upしてみます。ConsulのDNS用のポートはデフォルトで`8600`です。
+Nomad Agent と Consul Agent が連携し、Consul 側には設定を行うことなくサービスカタログが更新されます。Consul の DNS インタフェースを利用してこのサービスを Look-up してみます。Consul の DNS 用のポートはデフォルトで`8600`です。
 
 ```console
 $ dig @127.0.0.1 -p 8600 nginx.service.consul. SRV
@@ -220,9 +220,9 @@ Takayukis-MBP.node.dc1.consul. 0 IN	TXT	"consul-network-segment="
 ;; MSG SIZE  rcvd: 188
 ```
 
-Consulのサービスカタログから実際のIPアドレスが返されます。実際のアプリケーションからもこのように問い合わせることで物理ロケーションを意識することなくアクセス可能です。
+Consul のサービスカタログから実際の IP アドレスが返されます。実際のアプリケーションからもこのように問い合わせることで物理ロケーションを意識することなくアクセス可能です。
 
-次にヘルスチェックを確認してみます。Consulのエンドポイントにアクセスして死活状況を見てみます。
+次にヘルスチェックを確認してみます。Consul のエンドポイントにアクセスして死活状況を見てみます。
 
 ```console
 $ curl http://127.0.0.1:8500/v1/health/checks/nginx | jq '.[].Status, .[].Output'
@@ -231,9 +231,9 @@ $ curl http://127.0.0.1:8500/v1/health/checks/nginx | jq '.[].Status, .[].Output
 "HTTP GET http://192.168.3.38:80/index.html: 200 OK Output: <!DOCTYPE html>\n<html>\n<head>\n<title>Welcome to nginx!</title>\n<style>\n    body {\n        width: 35em;\n        margin: 0 auto;\n        font-family: Tahoma, Verdana, Arial, sans-serif;\n    }\n</style>\n</head>\n<body>\n<h1>Welcome to nginx!</h1>\n<p>If you see this page, the nginx web server is successfully installed and\nworking. Further configuration is required.</p>\n\n<p>For online documentation and support please refer to\n<a href=\"http://nginx.org/\">nginx.org</a>.<br/>\nCommercial support is available at\n<a href=\"http://nginx.com/\">nginx.com</a>.</p>\n\n<p><em>Thank you for using nginx.</em></p>\n</body>\n</html>\n"
 ```
 
-指定した`index.html`にアクセスを実行し、`200`のレスポンスコードとHTMLが正しく返ってきています。Consulは`passing`とし正常なサービスとしてみなされています。
+指定した`index.html`にアクセスを実行し、`200`のレスポンスコードと HTML が正しく返ってきています。Consul は`passing`とし正常なサービスとしてみなされています。
 
-エラーを返すようにnginxの設定を編集していきます。`<CONTAINER_ID>`は先ほどメモした内容に置き換えて下さい。
+エラーを返すように nginx の設定を編集していきます。`<CONTAINER_ID>`は先ほどメモした内容に置き換えて下さい。
 
 ```shell
 $ docker exec -it <nginxのCONTAINER_ID> bin/bash
@@ -246,7 +246,7 @@ root@26f5b587fbee:/ rm /usr/share/nginx/html/index.html
 root@26f5b587fbee:/ exit
 ```
 
-これで`index.html`へのアクセスはエラーになるはずです。もう一度Consulのエンドポイントにアクセスして死活状況を見てみます。
+これで`index.html`へのアクセスはエラーになるはずです。もう一度 Consul のエンドポイントにアクセスして死活状況を見てみます。
 
 ```console
 $ curl http://127.0.0.1:8500/v1/health/checks/nginx | jq '.[].Status, .[].Output'
@@ -255,7 +255,7 @@ $ curl http://127.0.0.1:8500/v1/health/checks/nginx | jq '.[].Status, .[].Output
 "HTTP GET http://192.168.3.38:80/index.html: 404 Not Found Output: <html>\r\n<head><title>404 Not Found</title></head>\r\n<body>\r\n<center><h1>404 Not Found</h1></center>\r\n<hr><center>nginx/1.17.8</center>\r\n</body>\r\n</html>\r\n"
 ```
 
-エラーが返り、Consulは`critical`として正異常なサービスとしてみなされています。この状態で再度ConsulのDNSにサービス名で問い合わせをしてみましょう。
+エラーが返り、Consul は`critical`として正異常なサービスとしてみなされています。この状態で再度 Consul の DNS にサービス名で問い合わせをしてみましょう。
 
 ```console
 $ dig @127.0.0.1 -p 8600 nginx.service.consul. SRV
@@ -285,35 +285,35 @@ consul.     0 IN  SOA ns.consul. hostmaster.consul. 1581042348 3600 600 86400 0
 
 このようにエラーとなったインスタンスは返されず自動的にサービスカタログから除外されます。
 
-一旦Nomadを停止しておきましょう。
+一旦 Nomad を停止しておきましょう。
 
 ```shell
 $ pkill nomad
 ```
 
-## Sidecarを利用するアプリのデプロイ
+## Sidecar を利用するアプリのデプロイ
 
-**この手順はLinux上のみで実行可能です。**
+**この手順は Linux 上のみで実行可能です。**
 
-次にConsul ConnectのSidecar Proxyを利用したアプリをどのようにNomadから定義して実行するかを試してみます。Consul Connectを利用するためにはCNI Pluginを有効化する必要があります。
+次に Consul Connect の Sidecar Proxy を利用したアプリをどのように Nomad から定義して実行するかを試してみます。Consul Connect を利用するためには CNI Plugin を有効化する必要があります。
 
 [こちら](https://nomadproject.io/guides/integrations/consul-connect/#cni-plugins)の手順でインストールをして下さい。
 
-インストールが終了したら`-dev-connect`のモードでNomadを起動します。
+インストールが終了したら`-dev-connect`のモードで Nomad を起動します。
 
 ```shell
 $ sudo nomad agent -dev-connect
 ```
 
-次にJobを作っていきます。デプロイするアプリのイメージは以下の通りです。
+次に Job を作っていきます。デプロイするアプリのイメージは以下の通りです。
 
 <kbd>
   <img src="https://github-image-tkaburagi.s3.ap-northeast-1.amazonaws.com/consul-workshop/intentions-1.png">
 </kbd>
 
-`japanapp`,`corpapp`,`hashiapp`,`hashicorpjapanapp`の四つのアプリが定義し、それぞれのコンテナにSidecar Proxyが同居しています。
+`japanapp`,`corpapp`,`hashiapp`,`hashicorpjapanapp`の四つのアプリが定義し、それぞれのコンテナに Sidecar Proxy が同居しています。
 
-トラフィックの流れとしては図の通りで`japanapp`が`Japan`の文字列を返し、`corpapp`が`japanapp`の結果に`Corp`の文字列をAppendして`Corp Japan`を返します。そして`hashiapp`が`Hashi`を返し、`hashicorpjapanapp`が`hashiapp`と`corpapp`にリクエストして結果の文字列を連結させ`HashiCorp Japan`をクライアントに返しています。
+トラフィックの流れとしては図の通りで`japanapp`が`Japan`の文字列を返し、`corpapp`が`japanapp`の結果に`Corp`の文字列を Append して`Corp Japan`を返します。そして`hashiapp`が`Hashi`を返し、`hashicorpjapanapp`が`hashiapp`と`corpapp`にリクエストして結果の文字列を連結させ`HashiCorp Japan`をクライアントに返しています。
 
 ```shell
 $ cat << EOF > hcj.nomad
@@ -443,7 +443,7 @@ EOF
 
 `service`内の`sidecar_service`がサイドカーの設定です。サイドカーのポート番号などを指定する事も出来ます。`proxy`にはサイドカープロキシの設定として`upstream`をしています。
 
-`destination_name`にはUpstream先のサービス名、`local_bind_port`ローカルでリスンするポートを指定しています。アプリの図を見ながら`destination_name`を確認するとイメージが出来るでしょう。
+`destination_name`には Upstream 先のサービス名、`local_bind_port`ローカルでリスンするポートを指定しています。アプリの図を見ながら`destination_name`を確認するとイメージが出来るでしょう。
 
 それではこのアプリをデプロイしてみましょう。
 
@@ -451,7 +451,7 @@ EOF
 $ nomad job run hcj.nomad
 ```
 
-Consulのブラウザにアクセスしてサービスを確認してみましょう。このようになっているはずです。
+Consul のブラウザにアクセスしてサービスを確認してみましょう。このようになっているはずです。
 
 <kbd>
   <img src="https://github-image-tkaburagi.s3-ap-northeast-1.amazonaws.com/nomad-workshop/Screen+Shot+2020-02-13+at+18.16.40.png">
@@ -464,7 +464,7 @@ $ curl 127.0.0.1:8080
 HashiCorp Japan
 ```
 
-サイドカープロキシを利用する際もConsulに対して設定を行うことなく、Nomadのジョブ設定でConsulと連携しJobを定義することが可能ということがわかります。Consulにはその他にもConfiguration Managementなどの機能があり、他の機能もNomadから利用することができます。
+サイドカープロキシを利用する際も Consul に対して設定を行うことなく、Nomad のジョブ設定で Consul と連携し Job を定義することが可能ということがわかります。Consul にはその他にも Configuration Management などの機能があり、他の機能も Nomad から利用することができます。
 
 ## 参考リンク
 * [Consul Conguration](https://www.nomadproject.io/docs/configuration/consul.html)

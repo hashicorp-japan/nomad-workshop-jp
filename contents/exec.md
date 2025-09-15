@@ -1,17 +1,17 @@
-## Exec Driverで様々なタスクを動かす
+## Exec Driver で様々なタスクを動かす
 
-NomadではNomadが稼働しているOS上で動作する様々なタイプのアプリケーションを実行することができます。このタイプのジョブには`Raw Exec`と`Isolated Exec`という二つのタイプのドライバーが存在します。
+Nomad では Nomad が稼働している OS 上で動作する様々なタイプのアプリケーションを実行することができます。このタイプのジョブには`Raw Exec`と`Isolated Exec`という二つのタイプのドライバーが存在します。
 
 出来ることは同じですが、以下のような違いがあります。
 
-* `Raw Exec`: リソースIsolationの機能がない。
-* `Isolated Exec`:　リソースIsolationの機能がある。
+* `Raw Exec`: リソース Isolation の機能がない。
+* `Isolated Exec`:　リソース Isolation の機能がある。
 
-`Isolated Exec`はRoot権限やcgroupファイルシステムがマウントされている必要があるため、今回は簡易的な`Raw Exec`ドライバーを使います。
+`Isolated Exec`は Root 権限や cgroup ファイルシステムがマウントされている必要があるため、今回は簡易的な`Raw Exec`ドライバーを使います。
 
-## Exec Driverを扱う
+## Exec Driver を扱う
 
-Execドライバーを扱うためにはまずクライアント(Jobを実行するサーバ)側の機能をEnableにする必要があります。ここでは一つのクライアントで有効化します。
+Exec ドライバーを扱うためにはまずクライアント(Job を実行するサーバ)側の機能を Enable にする必要があります。ここでは一つのクライアントで有効化します。
 
 `nomad-local-config-client-1.hcl`ファイルに下記の行を追加してください。
 
@@ -78,17 +78,17 @@ $ nomad fs ${ALLOC} alloc/logs/echo.stdout.0
 Hi Nomad Exec Driver
 ```
 
-以上のようにとても簡単にOSの機能を使ってスクリプトを実行することが出来ます。
+以上のようにとても簡単に OS の機能を使ってスクリプトを実行することが出来ます。
 
 ## 様々なタイプのアプリを稼働させる
 
-さて、今までは簡単なシェルスクリプトを実行させてきました。ExecドライバーではNomadクライアントのOSが対応していれば様々なタイプのワークロードを稼働させることが可能です。
+さて、今までは簡単なシェルスクリプトを実行させてきました。Exec ドライバーでは Nomad クライアントの OS が対応していれば様々なタイプのワークロードを稼働させることが可能です。
 
-ここでは`Goland`と`PHP`の二つのシンプルなWebアプリケーションを動かしてみます。
+ここでは`Goland`と`PHP`の二つのシンプルな Web アプリケーションを動かしてみます。
 
 [Go](https://golang.org/dl/)と[PHP](https://www.php.net/manual/en/install.php)がインストールされていることを確認してください。
 
-まずはGoで試してみます。以下のファイルを作ってください。
+まずは Go で試してみます。以下のファイルを作ってください。
 
 ```shell
 $ cd /path/to/nomad-workshop
@@ -109,7 +109,7 @@ func main() {
 EOF
 ```
 
-次にこのアプリを稼働させるためのNomadの定義ファイルを作っていきます。
+次にこのアプリを稼働させるための Nomad の定義ファイルを作っていきます。
 
 ```shell
 $ export DIR=$(pwd)
@@ -134,7 +134,7 @@ job "hello-exec-go-web" {
 EOF
 ```
 
-シェルスクリプト同様、`command`と`args`を利用してアプリケーションの実行コマンドを記述するだけです。それではこれをNomadで動かしてみます。
+シェルスクリプト同様、`command`と`args`を利用してアプリケーションの実行コマンドを記述するだけです。それではこれを Nomad で動かしてみます。
 
 ```shell
 $ nomad job run -hcl1 hello-exec-go.nomad
@@ -147,9 +147,9 @@ $ curl localhost:8080
 Hello World! Go is running on Nomad
 ```
 
-とても簡単です。興味のある方は`http://127.0.0.1:4646/ui/jobs/hello-exec-go-web`にアクセスしてJobの様子も確認して見ましょう。
+とても簡単です。興味のある方は`http://127.0.0.1:4646/ui/jobs/hello-exec-go-web`にアクセスして Job の様子も確認して見ましょう。
 
-次はPHPのアプリです。同様にアプリのファイルを作ってそれを稼働させるためのNomadファイルを作ります。Goと同様、`/usr/bin/php`は環境によって異なりますので`which php`で確認して置き換えてください。
+次は PHP のアプリです。同様にアプリのファイルを作ってそれを稼働させるための Nomad ファイルを作ります。Go と同様、`/usr/bin/php`は環境によって異なりますので`which php`で確認して置き換えてください。
 
 ```shell
 $ cat <<EOF > hello.php
@@ -189,9 +189,9 @@ $ curl localhost:8888
 Hello World! PHP is running on Nomad
 ```
 
-今まで同様にアプリケーションがNomad上で稼働していることがわかります。以上のようにNomadではDockerコンテナ化されたアプリケーションやJavaアプリケーションを専用のドライバーで稼働させることのみならず、コンテナ化されてないようなアプリケーションも簡単に稼働させられることがわかりました。
+今まで同様にアプリケーションが Nomad 上で稼働していることがわかります。以上のように Nomad では Docker コンテナ化されたアプリケーションや Java アプリケーションを専用のドライバーで稼働させることのみならず、コンテナ化されてないようなアプリケーションも簡単に稼働させられることがわかりました。
 
-Nomadはコンテナのエコシステムを最大限利用できる一方、簡単なスクリプト、バッチ処理やあらゆるWebのワークロードも実行させることが出来ます。
+Nomad はコンテナのエコシステムを最大限利用できる一方、簡単なスクリプト、バッチ処理やあらゆる Web のワークロードも実行させることが出来ます。
 
 最後にジョブを停止しておきましょう。
 
@@ -200,15 +200,15 @@ $ nomad job stop hello-exec-go-web
 $ nomad job stop hello-exec-php-web
 ```
 
-## SpreadとAffinityとConstraintでJobのデプロイを制御する
+## Spread と Affinity と Constraint で Job のデプロイを制御する
 
-最後に`affinity`と`spread`と`constraint`という機能を使ってJobのデプロイメント先の制御を行ってみます。この機能は今まで利用した`Volume`, `Logs`や`Artifact`と同様、Execドライバー以外でも利用することが出来ます。
+最後に`affinity`と`spread`と`constraint`という機能を使って Job のデプロイメント先の制御を行ってみます。この機能は今まで利用した`Volume`, `Logs`や`Artifact`と同様、Exec ドライバー以外でも利用することが出来ます。
 
 ### Spread
 
-`Spread`はJob定義の中の`task group`内に定義します。Spreadを利用することでデータセンター、ラックやノードに跨ったデプロイが可能となり、それぞれにどのくらいの割合でデプロイするかなどを設定ベースで制御することが可能となります。
+`Spread`は Job 定義の中の`task group`内に定義します。Spread を利用することでデータセンター、ラックやノードに跨ったデプロイが可能となり、それぞれにどのくらいの割合でデプロイするかなどを設定ベースで制御することが可能となります。
 
-ここでは`初めてのNomad`の章で起動させた3ノードクラスタに対してJobを分散させてみます。ここではポートの重複等を気にしなくていいように`exec.nomad`で定義したシェルスクリプトのジョブを利用することにします。
+ここでは`初めてのNomad`の章で起動させた 3 ノードクラスタに対して Job を分散させてみます。ここではポートの重複等を気にしなくていいように`exec.nomad`で定義したシェルスクリプトのジョブを利用することにします。
 
 まず、各クライアントの設定を書き換えます。
 
@@ -404,7 +404,7 @@ EOF
 
 `attribute`が基準となる値で今回は`meta.Name`を利用しています。この他にも[こちら](https://www.nomadproject.io/docs/runtime/interpolation.html#interpreted_node_vars)に記載されているようなリージョン、データセンターなど様々な指定が可能です。
 
-また`count = 10`とし、同じジョブを10個稼働させています。
+また`count = 10`とし、同じジョブを 10 個稼働させています。
 
 これをデプロイしてみます。
 
@@ -434,7 +434,7 @@ fb919166  8f5984b6  example     2        run      complete  42m38s ago  42m36s a
 c7a2f6c2  4b635091  example     1        run      complete  2h55m ago   44m44s ago
 ```
 
-`Version 2`の`Node ID`を見ると50%ずつ二つのノードに分散されていることがわかるでしょう。
+`Version 2`の`Node ID`を見ると 50%ずつ二つのノードに分散されていることがわかるでしょう。
 
 次に`7:2:1`の割合に変更してみます。
 
@@ -516,13 +516,13 @@ c7a2f6c2  4b635091  example     1        run      complete  2h55m ago   44m44s a
 
 `Version 3`の`Node ID`の結果を見ると設定した通りに分散しているでしょう。
 
-このようにSpreadの機能を利用すると設定ベースで簡単にジョブを分散させ、その割合を設定することが出来ます。
+このように Spread の機能を利用すると設定ベースで簡単にジョブを分散させ、その割合を設定することが出来ます。
 
 ### Affinity
 
-次は`Affinity`です。Affinityは各ジョブを実行する場所を条件を指定して制御出来る機能です。同一環境内に複数のOSやカーネルのバージョンやGPUなどのマシンが混在している際、ランダムで分散させると起動しないようなワークロードを指定して稼働させたいような時に利用できます。
+次は`Affinity`です。Affinity は各ジョブを実行する場所を条件を指定して制御出来る機能です。同一環境内に複数の OS やカーネルのバージョンや GPU などのマシンが混在している際、ランダムで分散させると起動しないようなワークロードを指定して稼働させたいような時に利用できます。
 
-Affinityは条件にマッチしない場合稼働出来るものは稼働するという性質を持っているため、同一マシン上では機能を試すことは出来ません。ここではAffinityルールの例をいくつか紹介します。
+Affinity は条件にマッチしない場合稼働出来るものは稼働するという性質を持っているため、同一マシン上では機能を試すことは出来ません。ここでは Affinity ルールの例をいくつか紹介します。
 
 1. カーネルバージョンでの指定
 
@@ -535,7 +535,7 @@ affinity {
 }
 ```
 
-2. OSでの指定(複数条件がある際は`weight`で優先度を決める)
+2. OS での指定(複数条件がある際は`weight`で優先度を決める)
 
 ```hcl
 affinity {
@@ -553,7 +553,7 @@ affinity {
 }
 ```
 
-3. AWSインスタンサイズでの指定
+3. AWS インスタンサイズでの指定
 
 ```hcl
 affinity {
@@ -568,16 +568,16 @@ affinity {
 
 ### Constraint
 
-最後に`Constraint`です。これはAffinityよりも厳しいルールで、条件に合わないノードへのデプロイを完全に制限するためのものです。
+最後に`Constraint`です。これは Affinity よりも厳しいルールで、条件に合わないノードへのデプロイを完全に制限するためのものです。
 
-今回は同一マシンで動かしているため、OSの制限をかけて意図的に全てのジョブがデプロイされないことを確認してみます。それぞれ自分のOSと違う設定をするため以下のコマンドを実行してください。
+今回は同一マシンで動かしているため、OS の制限をかけて意図的に全てのジョブがデプロイされないことを確認してみます。それぞれ自分の OS と違う設定をするため以下のコマンドを実行してください。
 
 * `macOS`の場合: `export MY_OS=windows`
 * `Ubuntu`の場合: `export MY_OS=windows`
 * `Cent OS`の場合: `export MY_OS=windows`
 * `Windows`の場合: `export MY_OS=darwin`
 
-Nomadのジョブ定義を作ります。
+Nomad のジョブ定義を作ります。
 
 ```shell
 $ cat << EOF > exec-constraint.nomad
@@ -620,7 +620,7 @@ $ nomad job run -hcl1 exec-constraint.nomad
     Evaluation "eb9b4c68" waiting for additional capacity to place remainder
 ```
 
-Constraintに引っかかり`Evaluation`のフェーズでエラーになるはずです。次に正しいOSに直してみます。
+Constraint に引っかかり`Evaluation`のフェーズでエラーになるはずです。次に正しい OS に直してみます。
 
 * `macOS`の場合: `export MY_OS=darwin`
 * `Ubuntu`の場合: `export MY_OS=ubuntu`
@@ -676,9 +676,9 @@ $ nomad job run -hcl1 exec-constraint.nomad
 ==> Evaluation "b5edcaa7" finished with status "complete"
 ```
 
-ジョブが正しく稼働されるはずです。今回は同一マシンであったため全てのクライアントで起動するかしないかでしたが、クライアントが複数混在している際はConstraintにマッチするノードのみでジョブが実行されます。
+ジョブが正しく稼働されるはずです。今回は同一マシンであったため全てのクライアントで起動するかしないかでしたが、クライアントが複数混在している際は Constraint にマッチするノードのみでジョブが実行されます。
 
-このようにNomadでは混在の環境でもJobを安全に実行するためのスケージューリングをサポートするための機能も充実しています。
+このように Nomad では混在の環境でも Job を安全に実行するためのスケージューリングをサポートするための機能も充実しています。
 
 最後にジョブを停止しておきましょう。
 

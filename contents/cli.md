@@ -1,12 +1,12 @@
-# Nomad CLIを色々と試す
+# Nomad CLI を色々と試す
 
-ここではnomad cliの基本的な使い方のガイドを通してNomadの様々な機能を解説してみたいと思います。
+ここでは nomad cli の基本的な使い方のガイドを通して Nomad の様々な機能を解説してみたいと思います。
 
-Nomadが起動できていない方は`初めてのNomad`を参照してNomadクラスターを起動させて下さい。
+Nomad が起動できていない方は`初めてのNomad`を参照して Nomad クラスターを起動させて下さい。
 
 ## completion
 
-Nomadではコマンド入力をサポートするための入力補足を用意しています。以下のコマンドでインストールしてみましょう。
+Nomad ではコマンド入力をサポートするための入力補足を用意しています。以下のコマンドでインストールしてみましょう。
 
 ```shell
 $ nomad -autocomplete-install
@@ -36,7 +36,7 @@ ID                                    DC   Name           Class   Address    Ver
 8f5984b6-faf6-a485-c3cf-2729e26fc775  dc1  Takayukis-MBP  <none>  127.0.0.1  0.10.0   false  eligible     ready
 ```
 
-また、`-json`オプションをつけるとJSONで結果が返ってきます。出力結果から値を取得したいような際にはとても便利です。
+また、`-json`オプションをつけると JSON で結果が返ってきます。出力結果から値を取得したいような際にはとても便利です。
 
 ```shell
 $ nomad node status -json
@@ -245,7 +245,7 @@ $ nomad node status -json
 ```
 </details>
 
-Nomadには、`drain`というコマンドを実行することでサーバメンテナンスやOSアップグレードなどの際にワークロードを移行することが出来ます。その際に各ノードを`ineligible`というモードに切り替え、新しいタスクのアロケーションなどを停止します。
+Nomad には、`drain`というコマンドを実行することでサーバメンテナンスや OS アップグレードなどの際にワークロードを移行することが出来ます。その際に各ノードを`ineligible`というモードに切り替え、新しいタスクのアロケーションなどを停止します。
 
 ```console
 $ nomad node drain -enable -yes <NODE_ID>
@@ -280,14 +280,14 @@ ID                                    DC   Name           Class   Address    Ver
 
 `nomad alloc`を使うとアロケーションの様々な情報を取得出来ます。試しにログを取得してみます。
 
-`初めてのNomad`の章でメモしたアロケーションIDを環境変数にセットしてから実施します。
+`初めてのNomad`の章でメモしたアロケーション ID を環境変数にセットしてから実施します。
 
 ```shell
 $ export ALLOC=<ALLOCAION_ID>
 $ nomad alloc logs $ALLOC
 ```
 
-次にこのアロケーションに関するファイルシステムを操作します。通常大元のディレクトリなどを辿っていかないといけませんが`fs`コマンドを利用することでアロケーションIDに紐づいた情報を取得してくれます。
+次にこのアロケーションに関するファイルシステムを操作します。通常大元のディレクトリなどを辿っていかないといけませんが`fs`コマンドを利用することでアロケーション ID に紐づいた情報を取得してくれます。
 
 ```console
 $ nomad alloc fs $ALLOC
@@ -378,7 +378,7 @@ Stable      = true
 Submit Date = 2020-01-31T15:53:24+09:00
 ```
 
-`eval`コマンドはEvaluationのステータスを確認するためのコマンドです。`初めてのNomad`の章でメモしたEvaluation IDをコピーして下さい。
+`eval`コマンドは Evaluation のステータスを確認するためのコマンドです。`初めてのNomad`の章でメモした Evaluation ID をコピーして下さい。
 
 ```console
 $ nomad eval status <EVAL_ID>
@@ -401,7 +401,7 @@ Task Group "mysql-group" (failed to place 1 allocation):
 Evaluation "0d142ec3" waiting for additional capacity to place remainder
 ```
 
-`status`はよく利用します。ジョブの状態やジョブに紐づくアロケーションIDを確認することが出来ます。
+`status`はよく利用します。ジョブの状態やジョブに紐づくアロケーション ID を確認することが出来ます。
 
 ```console
 $ nomad job status example
@@ -435,7 +435,7 @@ ID        Node ID   Task Group  Version  Desired  Status   Created     Modified
 3761cbaf  4b635091  cache       0        stop     failed   53m32s ago  43m48s ago
 ```
 
-`inspect`はNomadのジョブの情報の詳細を取得するためのコマンドです。また、結果をJSONで欲しい時も使います。`nomad job status`では`-json`オプションではなく`inspect`を使うようです。
+`inspect`は Nomad のジョブの情報の詳細を取得するためのコマンドです。また、結果を JSON で欲しい時も使います。`nomad job status`では`-json`オプションではなく`inspect`を使うようです。
 
 ```shell
 $ nomad inspect example
@@ -638,11 +638,11 @@ $ nomad inspect example
 ```
 </details>
 
-その他にも`run`, `stop`などジョブの起動停止を行うようなコマンドやイベント処理をinvokeする`dispatch`、ジョブをCanaryでプロモーションするための`promote`など様々な操作を`job`コマンドを利用して行います。
+その他にも`run`, `stop`などジョブの起動停止を行うようなコマンドやイベント処理を invoke する`dispatch`、ジョブを Canary でプロモーションするための`promote`など様々な操作を`job`コマンドを利用して行います。
 
 ## monitor
 
-`monitor`コマンドはNomadエージェントのログを取得するためのコマンドで、デバッグログなどを確認したいときにとても便利です。特に異常やイベントや操作がない限りは何も表示されないのが正しいです。
+`monitor`コマンドは Nomad エージェントのログを取得するためのコマンドで、デバッグログなどを確認したいときにとても便利です。特に異常やイベントや操作がない限りは何も表示されないのが正しいです。
 
 ```console
 $ nomad monitor -log-level=DEBUG
@@ -652,9 +652,9 @@ $ nomad monitor -log-level=DEBUG
 2020-02-01T23:38:02.353+0900 [DEBUG] nomad: raft: Vote granted from 127.0.0.1:4647 in term 34. Tally: 1
 ```
 
-`-node-id`や`-server-id`でログを絞ったり、`-json`でJSON形式でログを出力することも可能です。
+`-node-id`や`-server-id`でログを絞ったり、`-json`で JSON 形式でログを出力することも可能です。
 
-`Ctrl+C`で抜けてください。これ以降の章様々な操作を行うので残しておいて別の端末で操作するのでもOKです。
+`Ctrl+C`で抜けてください。これ以降の章様々な操作を行うので残しておいて別の端末で操作するのでも OK です。
 
 ## その他のコマンド
 

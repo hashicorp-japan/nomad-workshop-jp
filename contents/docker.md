@@ -1,18 +1,18 @@
-## NomadでDockerイメージを動かす
+## Nomad で Docker イメージを動かす
 
-NomadではDockerのようなコンテナのワークロードにとどまらず、スタンドアロンの`Java`, `RaW Exec`や`Qemu`など様々なタイプのTaskを実行できます。
+Nomad では Docker のようなコンテナのワークロードにとどまらず、スタンドアロンの`Java`, `RaW Exec`や`Qemu`など様々なタイプの Task を実行できます。
 
-各Taskはクライアント上の`Task Driver`によってリソースがIsolationされ実行されます。Task Driverはプラガブルで、各ドライバーの定義はJob定義のTaskn内の`plugin stanza`で設定します。
+各 Task はクライアント上の`Task Driver`によってリソースが Isolation され実行されます。Task Driver はプラガブルで、各ドライバーの定義は Job 定義の Taskn 内の`plugin stanza`で設定します。
 
-ここではいくつかのDockerイメージをNomad上で動かしてみます。また、この章では永続ディスクも試してみます。
+ここではいくつかの Docker イメージを Nomad 上で動かしてみます。また、この章では永続ディスクも試してみます。
 
-## Docker Task Driverを扱う
+## Docker Task Driver を扱う
 
-Docker Task Driverはその名の通り、Docker Imageを実行させるためのDriverです。これを利用することでDocker Imageのpullや実行させるために必要なVolumeやネットワークの設定を宣言的に行うことが可能です。
+Docker Task Driver はその名の通り、Docker Image を実行させるための Driver です。これを利用することで Docker Image の pull や実行させるために必要な Volume やネットワークの設定を宣言的に行うことが可能です。
 
-まず一つ簡単なDocker ImageをNomad上で稼働させてみましょう。
+まず一つ簡単な Docker Image を Nomad 上で稼働させてみましょう。
 
-以下のようにJobの定義ファイルを作成します。
+以下のように Job の定義ファイルを作成します。
 
 ```shell
 $ cd nomad-workshop
@@ -53,21 +53,21 @@ job "mysql-5.7" {
 EOF
 ```
 
-`job`の`datacenters`にはデフォルトの`dc1`としています。`type`にはジョブのタイプをしていますが、今回はMySQLでLong Running Processなので`service`としています。
+`job`の`datacenters`にはデフォルトの`dc1`としています。`type`にはジョブのタイプをしていますが、今回は MySQL で Long Running Process なので`service`としています。
 
-`group`がTask Groupで`count`はTaskの数です。今回はMySQL1インスタントとしますので`1`です。`task`の中が実際のアプリです。`driver`はDockerを指定していて、それ以降がDocker関連の`image`, `port_map`, `env`の設定です。
+`group`が Task Group で`count`は Task の数です。今回は MySQL1 インスタントとしますので`1`です。`task`の中が実際のアプリです。`driver`は Docker を指定していて、それ以降が Docker 関連の`image`, `port_map`, `env`の設定です。
 
-`image`はデフォルトだとDocker HubからPullしてきますが、URLを記述することで他のレジストリからも取得できます。`env`にはMySQLのイメージ起動に必要なrootパスワードを設定しています。
+`image`はデフォルトだと Docker Hub から Pull してきますが、URL を記述することで他のレジストリからも取得できます。`env`には MySQL のイメージ起動に必要な root パスワードを設定しています。
 
-`network`の`port`には今回はMySQLなのでStaticに`3306`として設定しています。また、これを`task.config.port_map`で指定した`3306`にポートフォワードしローカルから疎通できるようにしています。
+`network`の`port`には今回は MySQL なので Static に`3306`として設定しています。また、これを`task.config.port_map`で指定した`3306`にポートフォワードしローカルから疎通できるようにしています。
 
-それではMySQLを動かしてみましょう。
+それでは MySQL を動かしてみましょう。
 
 ```shell
 $ nomad job run -hcl1 mysql.nomad
 ```
 
-しばらくするとDockerプロセスが立ち上がります。
+しばらくすると Docker プロセスが立ち上がります。
 
 ```console
 $ docker ps
@@ -105,16 +105,16 @@ ID        Node ID   Task Group   Version  Desired  Status   Created  Modified
 fc0c5fcf  31528bd6  mysql-group  0        run      running  27s ago  4s ago
 ```
 
-ログインしてみましょう。IPアドレスは環境によって異なります。`docker ps`の出力結果のものをコピーしてください。
+ログインしてみましょう。IP アドレスは環境によって異なります。`docker ps`の出力結果のものをコピーしてください。
 
 ```console
 $ mysql -u root -p -h192.168.3.183
 Enter password:rooooot
 ```
 
-## Persistence Diskを扱う
+## Persistence Disk を扱う
 
-次にデータを永続化するためのPersistence Diskの設定を行います。まずそのままの状態で試しにデータを書き込んで再起動し、データが永続化されていないことを確認してみます。
+次にデータを永続化するための Persistence Disk の設定を行います。まずそのままの状態で試しにデータを書き込んで再起動し、データが永続化されていないことを確認してみます。
 
 データを投入して再起動してみましょう。
 
@@ -123,7 +123,7 @@ mysql> create database handson;
 mysql> show databases;
 ```
 
-この状態でNomad Jobを再起動します。現在はNomadにストレージの設定を行っておらずJobは永続ディスクを持っていません。そのため、再起動するとデータは揮発するはずです。
+この状態で Nomad Job を再起動します。現在は Nomad にストレージの設定を行っておらず Job は永続ディスクを持っていません。そのため、再起動するとデータは揮発するはずです。
 
 ```shell
 $ nomad job stop mysql-5.7
@@ -140,16 +140,16 @@ $ mysql -u root -p -h192.168.3.183
 mysql> show databases;
 ```
 
-先ほど作成した`handson`データベースは消えているでしょう。Dockerを使いつつ、データベースなどディスクが要求されるStatefulなワークロードを扱うにはNomadの`volume`機能を利用します。
+先ほど作成した`handson`データベースは消えているでしょう。Docker を使いつつ、データベースなどディスクが要求される Stateful なワークロードを扱うには Nomad の`volume`機能を利用します。
 
-Persistent Diskを使うためには
+Persistent Disk を使うためには
 
-1. Clientでホストのボリュームを扱う設定を行う
-2. Jobの定義でそれを利用するための設定を行う
+1. Client でホストのボリュームを扱う設定を行う
+2. Job の定義でそれを利用するための設定を行う
 
 の二つが必要です。
 
-まずはClient側の設定をします。
+まずは Client 側の設定をします。
 
 ```shell
 $ cd nomad-workshop
@@ -169,13 +169,13 @@ client {
 }
 ```
 
-3つのファイルを書き換えたら再起動します。
+3 つのファイルを書き換えたら再起動します。
 
 ```shell
 $ ./run.sh
 ```
 
-次にMySQLのジョブのファイルを下記のように書き換えます。
+次に MySQL のジョブのファイルを下記のように書き換えます。
 
 ```shell
 $ cd nomad-workshop
@@ -231,9 +231,9 @@ job "mysql-5.7" {
 EOF
 ```
 
-ここでは`host_volume`で作ったVolumeをTask Groupにマッピングし、実際のTaskにマウントしています。
+ここでは`host_volume`で作った Volume を Task Group にマッピングし、実際の Task にマウントしています。
 
-これを使ってMySQLを起動します。
+これを使って MySQL を起動します。
 
 ```shell
 $ nomad job run -hcl1 mysql.nomad
@@ -253,7 +253,7 @@ mysql> create database handson;
 mysql> show databases;
 ```
 
-Nomad Jobを再起動します。
+Nomad Job を再起動します。
 
 ```shell
 $ nomad job stop mysql-5.7
@@ -280,9 +280,9 @@ ca.pem             ib_buffer_pool     ibtmp1             public_key.pem
 client-cert.pem    ib_logfile0        mysql              server-cert.pem
 ```
 
-MySQLのデータがホストに保存されていることがわかるはずです。今回は`host_volume`を利用しましたがNomadは`CSI Plugin`に対応しており、様々なタイプのストレージを扱うことが可能です。
+MySQL のデータがホストに保存されていることがわかるはずです。今回は`host_volume`を利用しましたが Nomad は`CSI Plugin`に対応しており、様々なタイプのストレージを扱うことが可能です。
 
-ここではDocker Driverの基本とPersistence Diskの設定を行いましたが、まだまだ様々な設定を行いことができます。
+ここでは Docker Driver の基本と Persistence Disk の設定を行いましたが、まだまだ様々な設定を行いことができます。
 
 最後にジョブを停止しておきましょう。
 

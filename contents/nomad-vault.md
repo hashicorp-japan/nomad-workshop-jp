@@ -1,29 +1,29 @@
-# NomadとVaultの連携機能を試す
+# Nomad と Vault の連携機能を試す
 
-NomadにはHashiCorp Vaultと連携をしダイナミックシークレットの発行やアプリからの利用など高度なシークレット管理を行うこと可能です。
+Nomad には HashiCorp Vault と連携をしダイナミックシークレットの発行やアプリからの利用など高度なシークレット管理を行うこと可能です。
 
-Vaultとの連携はNomadの設定ベースで行うことができます。Vaultを初めて触る方は、このハンズオンを実行する前に[Vault Workshop](https://github.com/hashicorp-japan/vault-workshop)を実施することをお勧めします。(資料を読んで「初めてのVault」と「AWS」で十分です)
+Vault との連携は Nomad の設定ベースで行うことができます。Vault を初めて触る方は、このハンズオンを実行する前に[Vault Workshop](https://github.com/hashicorp-japan/vault-workshop)を実施することをお勧めします。(資料を読んで「初めての Vault」と「AWS」で十分です)
 
-まずはVaultをインストールして起動してみましょう。
+まずは Vault をインストールして起動してみましょう。
 
-## Vaultのインストール
+## Vault のインストール
 
-[こちら](https://www.vaultproject.io/downloads/)のWebサイトからご自身のOSに合ったものをダウンロードしてください。
+[こちら](https://www.vaultproject.io/downloads/)の Web サイトからご自身の OS に合ったものをダウンロードしてください。
 
-/usr/local/bin/vaultでvaultコマンドにパスを通します。
+/usr/local/bin/vault で vault コマンドにパスを通します。
 
 ```shell
 $ mv /path/to/vault /usr/local/bin
 $ chmod +x /usr/local/bin/vault
 ```
-新しい端末を立ち上げ、Vaultのバージョンを確認します。
+新しい端末を立ち上げ、Vault のバージョンを確認します。
 
 ```console
 $ vault --version
 Vault v1.5.1
 ```
 
-これでインストールは完了です。別端末でVaultを`dev`モードで立ち上げます。
+これでインストールは完了です。別端末で Vault を`dev`モードで立ち上げます。
 
 ```shell
 $ vault server -dev
@@ -31,16 +31,16 @@ $ vault server -dev
 
 起動ログに表示される`Root Token`の値をメモしてください。
 
-## Nomadサーバの設定
+## Nomad サーバの設定
 
-NomadとVaultが連携をすることで以下のようなことを実現できます。
+Nomad と Vault が連携をすることで以下のようなことを実現できます。
 
-* NomadサーバがVaultのトークンを動的に発行し安全に格納
-* 上記で格納したトークンを利用し、Vaultにシークレットの発行を依頼
+* Nomad サーバが Vault のトークンを動的に発行し安全に格納
+* 上記で格納したトークンを利用し、Vault にシークレットの発行を依頼
 
 これを利用することで`Secret Zero Problem`という「最初のトークンをどのように発行し、どのようにアプリから利用させるか」という問題を解決することができます。
 
-まずNomadサーバにVaultのVaultのトークンを発行させるための設定を行いNomadサーバを再起動します。
+まず Nomad サーバに Vault の Vault のトークンを発行させるための設定を行い Nomad サーバを再起動します。
 
 ```shell
 $ cd /path/to/nomad-workshop
@@ -114,9 +114,9 @@ EOF
 $ chmod +x run-vault-local.sh
 ```
 
-`NomadサーバがVaultのトークンを動的に発行`と記述しましたが、これはNomadサーバがVault APIを実行し、Vaultのトークンを発行するという挙動になります。そのため、`NomadサーバがVault APIを実行`するための大元のトークンが必要です。
+`NomadサーバがVaultのトークンを動的に発行`と記述しましたが、これは Nomad サーバが Vault API を実行し、Vault のトークンを発行するという挙動になります。そのため、`NomadサーバがVault APIを実行`するための大元のトークンが必要です。
 
-環境変数にその大元のトークンをセットし起動することで以降、そのトークンを利用して実際にアプリが利用するトークンを生成していきます。`<ROOT_TOKEN>`を先ほどメモした`Root Token`に置き換えてください。(通常はRoot Tokenは利用しません)加えてVaultのURLも環境変数にセットします。
+環境変数にその大元のトークンをセットし起動することで以降、そのトークンを利用して実際にアプリが利用するトークンを生成していきます。`<ROOT_TOKEN>`を先ほどメモした`Root Token`に置き換えてください。(通常は Root Token は利用しません)加えて Vault の URL も環境変数にセットします。
 
 ```shell
 $ export VAULT_TOKEN=<ROOT_TOKEN>
@@ -125,11 +125,11 @@ $ export VAULT_ADDR='http://127.0.0.1:8200'
 $ ./run-vault-local.sh
 ```
 
-これでVaultとNomadサーバの連携の設定が完了し、Vaultトークンを動的に発行できるようになりました。
+これで Vault と Nomad サーバの連携の設定が完了し、Vault トークンを動的に発行できるようになりました。
 
-## Vault側の設定
+## Vault 側の設定
 
-次にVault側の設定を行います。今回の例ではNomadサーバが発行したトークンを利用して、Vault経由でアプリからAWSのキーを発行します。そのためVaultにAWSのAPIを実行させるための設定を行います。
+次に Vault 側の設定を行います。今回の例では Nomad サーバが発行したトークンを利用して、Vault 経由でアプリから AWS のキーを発行します。そのため Vault に AWS の API を実行させるための設定を行います。
 
 ```shell
 $ vault secrets enable aws
@@ -139,7 +139,7 @@ $ vault write aws/config/root \
     region=ap-northeast-1
 ```
 
-次に`実際にアプリが利用するトークン`に与える権限の設定です。Vaultのポリシーの設定を作成します。
+次に`実際にアプリが利用するトークン`に与える権限の設定です。Vault のポリシーの設定を作成します。
 
 ```shell
 $ cat << EOF > aws.hcl
@@ -160,9 +160,9 @@ default
 root
 ```
 
-このポリシーに基づいたトークンをNomadサーバに発行させ、その発行されたトークンを利用してアプリからAWSのキーを発行します。
+このポリシーに基づいたトークンを Nomad サーバに発行させ、その発行されたトークンを利用してアプリから AWS のキーを発行します。
 
-次にVaultが発行するAWSのキーに与える権限をロールとして設定します。この例は`s3`への権限のあるロールです。
+次に Vault が発行する AWS のキーに与える権限をロールとして設定します。この例は`s3`への権限のあるロールです。
 
 ```shell
 $ vault write aws/roles/s3-role \
@@ -181,11 +181,11 @@ $ vault write aws/roles/s3-role \
 EOF
 ```
 
-このロールを利用してアプリがAWSのキーをVault経由で発行するとアプリはS3への操作を行う権限のあるキーを受け取るというイメージです。
+このロールを利用してアプリが AWS のキーを Vault 経由で発行するとアプリは S3 への操作を行う権限のあるキーを受け取るというイメージです。
 
-## Nomadジョブの起動
+## Nomad ジョブの起動
 
-それでは最後にNomadのジョブを作っていきます。
+それでは最後に Nomad のジョブを作っていきます。
 
 ```shell
 $ cat << EOF > hello-vault.nomad
@@ -214,9 +214,9 @@ job "hello-vault" {
 EOF
 ```
 
-`vault`スタンザ内でアプリが利用するVaultトークンのポリシーを設定しています。`change_mode`はVaultトークンを再作成するタイミングの設定でこの場合は`restart`と再起動時として指定しています。
+`vault`スタンザ内でアプリが利用する Vault トークンのポリシーを設定しています。`change_mode`は Vault トークンを再作成するタイミングの設定でこの場合は`restart`と再起動時として指定しています。
 
-`config`内ではアプリの実行コマンドでVaultにAWSのキーを発行するようにしています。
+`config`内ではアプリの実行コマンドで Vault に AWS のキーを発行するようにしています。
 
 ```console
 $ nomad job run hello-vault.nomad
@@ -228,7 +228,7 @@ $ nomad job run hello-vault.nomad
 ==> Evaluation "1246a789" finished with status "complete"
 ```
 
-Allicationの値をメモしてください。以下の`<Allocation>`を置き換えます。
+Allication の値をメモしてください。以下の`<Allocation>`を置き換えます。
 
 ```console
 $ export ALLOC_ID=$(nomad alloc status -json <Allocation> | jq -r '.ID')
@@ -265,7 +265,7 @@ ttl                  71h59m24s
 type                 service
 ```
 
-指定したポリシーのトークンであることがわかるでしょう。アプリからこのトークンを透過的に利用してVaultのAPIを実行します。次にアプリの実行コマンドの結果を見てみましょう。アプリがトークンを使ってAWSのキーが発行したため、キーが一つ生成されているはずです。
+指定したポリシーのトークンであることがわかるでしょう。アプリからこのトークンを透過的に利用して Vault の API を実行します。次にアプリの実行コマンドの結果を見てみましょう。アプリがトークンを使って AWS のキーが発行したため、キーが一つ生成されているはずです。
 
 ```console
 $ nomad fs ${ALLOC_ID} /alloc/logs/hello-vault.stdout.0
@@ -279,7 +279,7 @@ secret_key         ***************
 security_token     <nil>
 ```
 
-Nomad上のアプリからVaultを利用してAWSのキーを動的に発行できることがわかりました。興味のある方はこのキーを利用してAWSのキーの権限を試してみてください。
+Nomad 上のアプリから Vault を利用して AWS のキーを動的に発行できることがわかりました。興味のある方はこのキーを利用して AWS のキーの権限を試してみてください。
 
 最後にジョブをストップしてみます。
 
@@ -294,9 +294,9 @@ Code: 403. Errors:
 * bad token
 ```
 
-`change_mode`で`restart`と指定しているためジョブが停止するとトークンがRevokeされ利用不可能になっています。再度起動すると新しいトークンが都度発行されるためとても安全にVaultを利用することができます。
+`change_mode`で`restart`と指定しているためジョブが停止するとトークンが Revoke され利用不可能になっています。再度起動すると新しいトークンが都度発行されるためとても安全に Vault を利用することができます。
 
-今回はシェルスクリプトを実行するダメの簡単なアプリでしたがWebのアプリでデータベースやクラウドのシークレットを発行するような際も同じように扱うことができます。`Secret Zero Problem`を解消しVaultの強力なダイナミックシークレットを安全に、かつ簡単に扱うことができます。
+今回はシェルスクリプトを実行するダメの簡単なアプリでしたが Web のアプリでデータベースやクラウドのシークレットを発行するような際も同じように扱うことができます。`Secret Zero Problem`を解消し Vault の強力なダイナミックシークレットを安全に、かつ簡単に扱うことができます。
 
 
 ## 参考リンク

@@ -1,22 +1,22 @@
-## NomadでJavaアプリケーションを動かす
+## Nomad で Java アプリケーションを動かす
 
-NomadではDockerのようなコンテナのワークロードにとどまらず、スタンドアロンの`Java`, `RaW Exec`や`Qemu`など様々なタイプのTaskを実行できます。
+Nomad では Docker のようなコンテナのワークロードにとどまらず、スタンドアロンの`Java`, `RaW Exec`や`Qemu`など様々なタイプの Task を実行できます。
 
-各Taskはクライアント上の`Task Driver`によってリソースがIsolationされ実行されます。Task Driverはプラガブルで、各ドライバーの定義はJob定義のTaskn内の`plugin stanza`で設定します。
+各 Task はクライアント上の`Task Driver`によってリソースが Isolation され実行されます。Task Driver はプラガブルで、各ドライバーの定義は Job 定義の Taskn 内の`plugin stanza`で設定します。
 
-ここではいくつかのJavaアプリケーションをNomad上で動かしてみます。また、この章ではNomadでのログ管理も試してみます。
+ここではいくつかの Java アプリケーションを Nomad 上で動かしてみます。また、この章では Nomad でのログ管理も試してみます。
 
-## Java Task Driverを扱う
+## Java Task Driver を扱う
 
-Java Task Driverはその名の通り、Javaアプリケーションを実行させるためのDriverです。これを利用することでDocker Imageのpullや実行させるために必要なVolumeやネットワークの設定を宣言的に行うことが可能です。
+Java Task Driver はその名の通り、Java アプリケーションを実行させるための Driver です。これを利用することで Docker Image の pull や実行させるために必要な Volume やネットワークの設定を宣言的に行うことが可能です。
 
-まず一つ簡単なJavaアプリをNomad上で稼働させてみましょう。
+まず一つ簡単な Java アプリを Nomad 上で稼働させてみましょう。
 
-**ローカルにJavaがインストールされていることを確認してください。**
+**ローカルに Java がインストールされていることを確認してください。**
 
-**Linux OSの方はローカルマシンのファイルをプロセスから取得することが不可能なためこの手順はスキップして「外部のArtifact Sourceから取得する」に進んでください。**
+**Linux OS の方はローカルマシンのファイルをプロセスから取得することが不可能なためこの手順はスキップして「外部の Artifact Source から取得する」に進んでください。**
 
-以下のようにJobの定義ファイルを作成します。
+以下のように Job の定義ファイルを作成します。
 
 ```shell
 $ cd nomad-workshop
@@ -52,7 +52,7 @@ job "hello-web-java" {
 EOF
 ```
 
-今回はJava Driverを利用するために`driver`の値に`java`と入れています。これでJavaのドライバを有効化し、`config`でJVMの設定を行うことが可能です。今回は`jar_path`に先ほどビルドしたアプリのパスと、`jvm_potion`にヒープサイズのMaxとMinを設定しています。JVM起動時に付与するオプションはここに設定します。
+今回は Java Driver を利用するために`driver`の値に`java`と入れています。これで Java のドライバを有効化し、`config`で JVM の設定を行うことが可能です。今回は`jar_path`に先ほどビルドしたアプリのパスと、`jvm_potion`にヒープサイズの Max と Min を設定しています。JVM 起動時に付与するオプションはここに設定します。
 
 それでは起動してみましょう。
 
@@ -97,25 +97,25 @@ ID        Node ID   Task Group  Version  Desired  Status   Created    Modified
 24f8e8e9  6477d9ed  java-web    0        run      running  1m2s ago   52s ago
 ```
 
-GUIでも確認できるので興味のある方は`http://localhost:4646/ui/jobs`をブラウザから見てください。
+GUI でも確認できるので興味のある方は`http://localhost:4646/ui/jobs`をブラウザから見てください。
 
-一度Javaのプロセスを停止させ、自動再起動されることを確認してみましょう。
+一度 Java のプロセスを停止させ、自動再起動されることを確認してみましょう。
 
 ```shell
 $ pkill java
 ```
 
-もう一度`nomad job status hello-web-java`を実行すると`failed`のステータスになり、しばらくしてもう一度実行すると`running`のステータスにself-healingされるはずです。
+もう一度`nomad job status hello-web-java`を実行すると`failed`のステータスになり、しばらくしてもう一度実行すると`running`のステータスに self-healing されるはずです。
 
-完全にStopしJobを削除してみましょう。
+完全に Stop し Job を削除してみましょう。
 
 ```shell
 $ nomad job stop -purge hello-web-java
 ```
 
-## 外部のArtifact Sourceから取得する
+## 外部の Artifact Source から取得する
 
-今回はローカルでビルドしたアプリを起動しましたが、CIと組み合わせるような際には外部のArtifactレポジトリから取得したいです。試してみましょう。
+今回はローカルでビルドしたアプリを起動しましたが、CI と組み合わせるような際には外部の Artifact レポジトリから取得したいです。試してみましょう。
 
 ```shell
 $ cd nomad-workshop
@@ -149,9 +149,9 @@ job "hello-web-java" {
 EOF
 ```
 
-`artifact`スタンザを追加し、`source`にサンプルのパブリックアクセス可能なJarファイルを取得しています。取得にキーが必要な場合は`options`にキーの値を入力します。また、`options`には`checksum`なども入れることが可能です。
+`artifact`スタンザを追加し、`source`にサンプルのパブリックアクセス可能な Jar ファイルを取得しています。取得にキーが必要な場合は`options`にキーの値を入力します。また、`options`には`checksum`なども入れることが可能です。
 
-取得したアーティファクトはデフォルトだとNomadサーバの`local/:filename`に保存されますのでこちらを指定しています。
+取得したアーティファクトはデフォルトだと Nomad サーバの`local/:filename`に保存されますのでこちらを指定しています。
 
 それでは起動してみましょう。
 
@@ -173,13 +173,13 @@ $ curl 127.0.0.1:8080
 Hey you. This Jar is from S3
 ```
 
-これはJava Driver以外にも様々なタイプのジョブで利用することが可能です。
+これは Java Driver 以外にも様々なタイプのジョブで利用することが可能です。
 
 ## ログを扱う
 
-次はロギングです。NomadではサーバやJobのログを保存し、サイズによってローテーションさせるような機能があります。この機能は`Docker`の章で実施した`Volume`や`Artifact`と同様、Java Driver特有の機能ではありませんが、ついでに試してみます。
+次はロギングです。Nomad ではサーバや Job のログを保存し、サイズによってローテーションさせるような機能があります。この機能は`Docker`の章で実施した`Volume`や`Artifact`と同様、Java Driver 特有の機能ではありませんが、ついでに試してみます。
 
-Nomadでは各サーバで指定したデータの入るディレクトリにログは出力されます。今回はローカルファイルシステムを利用しているのではまずはJavaのアプリがホストされているノードを探して、そこのデータ用のディレクトリから実際のログを見てみます。
+Nomad では各サーバで指定したデータの入るディレクトリにログは出力されます。今回はローカルファイルシステムを利用しているのではまずは Java のアプリがホストされているノードを探して、そこのデータ用のディレクトリから実際のログを見てみます。
 
 ```console
 $ nomad job status hello-web-java
@@ -212,9 +212,9 @@ ID        Node ID   Task Group  Version  Desired  Status    Created     Modified
 50fbdd29  4b635091  java-web    5        run      running   12m47s ago  11m41s ago
 ```
 
-こちらの出力結果から、`running`と成功しているAllocationから`Allocation ID`を取得します。上の例だと`50fbdd29`に相当します。
+こちらの出力結果から、`running`と成功している Allocation から`Allocation ID`を取得します。上の例だと`50fbdd29`に相当します。
 
-これがJavaがホストされているノードです。このノードがどのディレクトリなのかを識別するために次のコマンドを実行してください。
+これが Java がホストされているノードです。このノードがどのディレクトリなのかを識別するために次のコマンドを実行してください。
 
 ```console
 $ export ALLOC=50fbdd29
@@ -249,7 +249,7 @@ logs {
 }
 ```
 
-このように記述することで最大保管するファイル数と1ファイルの最大`MB`数を指定することができます。
+このように記述することで最大保管するファイル数と 1 ファイルの最大`MB`数を指定することができます。
 
 最後にジョブを停止しておきましょう。
 

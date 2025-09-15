@@ -11,7 +11,7 @@ $ cd nomad-workshop
 
 [こちら](https://www.nomadproject.io/downloads.html)より、お使いの OS に合ったものをダウンロードしてください。
 
-Nomad は他の HashiCorp 製品と同様にシングルバイナリですので、ダウンロードしたバイナリにPathを通すだけで使用可能です。
+Nomad は他の HashiCorp 製品と同様にシングルバイナリですので、ダウンロードしたバイナリに Path を通すだけで使用可能です。
 
 ```console
 $ unzip nomad*.zip
@@ -211,7 +211,7 @@ CONTAINER ID   IMAGE                       COMMAND                  CREATED     
 eed3eb50795d   redis:7                     "docker-entrypoint.s…"   7 minutes ago    Up 7 minutes    127.0.0.1:25305->6379/tcp, 127.0.0.1:25305->6379/udp   redis-7ca34a50-34c4-c97d-99be-25b0d2db3f2e
 ```
 
-Job ファイルの定義通りコンテナが3つ起動していることが確認できます。
+Job ファイルの定義通りコンテナが 3 つ起動していることが確認できます。
 さて、Nomad は Job ファイルに書かれている状態を維持するよう Job を監視します。そこで、強制的にひとつのコンテナを `kill` してみましょう。ここでは Container ID が `8fdc9b553899` のコンテナを終了させます。
 
 ```console
@@ -274,7 +274,7 @@ d64cb1dc  d7bbd92f  cache       1        run      pending  4m36s ago   5s ago
 7ca34a50  d7bbd92f  cache       1        run      running  11m56s ago  4m25s ago
 ```
 
-1つのコンテナが `pending` になっており、Nomad により Desired の状態になっているかがチェックされてることがわかります。
+1 つのコンテナが `pending` になっており、Nomad により Desired の状態になっているかがチェックされてることがわかります。
 
 
 Nomad の Job を終了させるには `nomad job stop` コマンドを使います。
@@ -303,9 +303,9 @@ $ nomad job stop example
 
 終了すると Nomad が Allocation した Job がクリーンアップされます。
 
-## Nomadを通常モードで起動する
+## Nomad を通常モードで起動する
 
-次はdevモードではなく通常モードで起動します。通常モードではサーバとクライアントを分けて起動することができたり、様々な柔軟な設定を行うことが出来ます。 今回はサーバ側を1台、クライアント側を3台とする構成で試してみます。
+次は dev モードではなく通常モードで起動します。通常モードではサーバとクライアントを分けて起動することができたり、様々な柔軟な設定を行うことが出来ます。 今回はサーバ側を 1 台、クライアント側を 3 台とする構成で試してみます。
 
 サーバ用に次のファイルを作ってください。
 
@@ -444,7 +444,7 @@ EOF
 ```
 </details>
 
-Nomadを起動させてみましょう。
+Nomad を起動させてみましょう。
 
 ```shell
 $ chmod +x run.sh
@@ -454,7 +454,7 @@ $ ./run.sh
 `http://localhost:4646/ui/`にブラウザでアクセスし、一つのサーバと三つのクライアントが起動していることを確認してください。
 
 > サーバ上で実行しローカルからブラウザにアクセスできない方はポートフォワーディングの設定をしてみて下さい。 
-> macOSの場合はローカルマシンでssh -L 4646:127.0.0.1:4646 <username>@<SERVERS_PUBLIC_IP> -Nです。
+> macOS の場合はローカルマシンで ssh -L 4646:127.0.0.1:4646 <username>@<SERVERS_PUBLIC_IP> -N です。
 
 試しに先ほどと同じジョブを起動させて見ます。
 
@@ -474,7 +474,7 @@ $ nomad job run example.nomad
 * `Allocation`はメモしておいて下さい(上の例だと`bb7db1e3`)。
 * `Evaluation`はメモしておいて下さい(上の例だと`164d6cf5`)。
 
-これ以降、この環境を使ってNomadの様々な機能を試していきます。
+これ以降、この環境を使って Nomad の様々な機能を試していきます。
 
 ## 参考リンク
 
